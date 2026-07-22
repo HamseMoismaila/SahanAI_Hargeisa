@@ -51,14 +51,14 @@ function SearchField({ onLocationFound, googleApiKey }) {
 
     map.addControl(searchControl);
 
-    const form = map.getContainer().querySelector('.leaflet-control-geosearch form');
+    const container = map.getContainer();
     const preventSubmit = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+      if (e.target && e.target.tagName === 'FORM' && e.target.closest('.leaflet-control-geosearch')) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
     };
-    if (form) {
-      form.addEventListener('submit', preventSubmit);
-    }
+    container.addEventListener('submit', preventSubmit);
 
     map.on('geosearch/showlocation', (result) => {
       onLocationFound({ lat: result.location.y, lng: result.location.x });
@@ -66,9 +66,7 @@ function SearchField({ onLocationFound, googleApiKey }) {
 
     return () => {
       map.removeControl(searchControl);
-      if (form) {
-        form.removeEventListener('submit', preventSubmit);
-      }
+      container.removeEventListener('submit', preventSubmit);
     };
   }, [map, onLocationFound, googleApiKey]);
 
