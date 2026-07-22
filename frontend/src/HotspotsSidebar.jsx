@@ -56,8 +56,13 @@ export default function HotspotsSidebar({ onSelectHotspot }) {
               </div>
 
               <button 
+                type="button"
                 className="locate-btn"
-                onClick={() => onSelectHotspot([coords[1], coords[0]])}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onSelectHotspot([coords[1], coords[0]]);
+                }}
               >
                 Locate & Analyze
               </button>

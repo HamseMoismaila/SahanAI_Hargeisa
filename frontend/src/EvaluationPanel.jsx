@@ -71,7 +71,11 @@ export default function EvaluationPanel({
   const netGain = futureValue - baseValue;
   const totalRoi = Math.round((netGain / baseValue) * 100);
 
-  const handleCompareClick = () => {
+  const handleCompareClick = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (!selection) return;
     onAddToCompare({
       lat: selection.lat,
@@ -88,6 +92,14 @@ export default function EvaluationPanel({
     });
   };
 
+  const handleClearCompareClick = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    onClearCompare();
+  };
+
   return (
     <div className="sidebar right-sidebar evaluation-panel">
       {/* Comparison Drawer / Section if comparison list has items */}
@@ -95,7 +107,13 @@ export default function EvaluationPanel({
         <div className="comparison-drawer-container">
           <div className="drawer-header">
             <h4>Plot Comparison ({comparisonList.length}/2)</h4>
-            <button className="clear-compare-btn" onClick={onClearCompare}>Clear</button>
+            <button 
+              type="button" 
+              className="clear-compare-btn" 
+              onClick={handleClearCompareClick}
+            >
+              Clear
+            </button>
           </div>
           
           <div className="comparison-slots-layout">
@@ -132,7 +150,11 @@ export default function EvaluationPanel({
           <div className="evaluation-header-section">
             <h3>Investment Analytics</h3>
             <p className="subtitle">Automated spatial pricing & valuation insights</p>
-            <button className="add-compare-btn" onClick={handleCompareClick}>
+            <button 
+              type="button" 
+              className="add-compare-btn" 
+              onClick={handleCompareClick}
+            >
               + Add to Compare List
             </button>
           </div>
@@ -150,20 +172,23 @@ export default function EvaluationPanel({
                   <span className="selector-title">Select valuation unit:</span>
                   <div className="selector-buttons">
                     <button 
+                      type="button"
                       className={`selector-btn ${plotType === 'sqm' ? 'active' : ''}`}
-                      onClick={() => setPlotType('sqm')}
+                      onClick={(e) => { e.preventDefault(); setPlotType('sqm'); }}
                     >
                       Per sqm
                     </button>
                     <button 
+                      type="button"
                       className={`selector-btn ${plotType === 'small' ? 'active' : ''}`}
-                      onClick={() => setPlotType('small')}
+                      onClick={(e) => { e.preventDefault(); setPlotType('small'); }}
                     >
                       Small Plot (18×12m)
                     </button>
                     <button 
+                      type="button"
                       className={`selector-btn ${plotType === 'large' ? 'active' : ''}`}
-                      onClick={() => setPlotType('large')}
+                      onClick={(e) => { e.preventDefault(); setPlotType('large'); }}
                     >
                       Large Plot (24×18m)
                     </button>
