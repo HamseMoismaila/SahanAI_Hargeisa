@@ -1,0 +1,29 @@
+# Data manipulation & Geospatial
+pandas
+geopandas
+rasterio
+shapely
+pysheds
+scipy
+
+# Earth Engine
+earthengine-api
+
+
+# Machine Learning
+scikit-learn
+xgboost
+
+# Web Scraping
+playwright
+beautifulsoup4
+requests
+geopy
+
+# Backend API
+fastapi
+uvicorn
+pydantic
+
+# Environment management
+python-dotenv

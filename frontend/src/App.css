@@ -1,0 +1,578 @@
+/* Reset & Base Styles */
+* { box-sizing: border-box; }
+body { 
+  margin: 0; 
+  padding: 0; 
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+  background-color: #0f172a; 
+  color: #f1f5f9; 
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #0f172a;
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-bottom: 1px solid #334155;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dashboard-header h1 { 
+  margin: 0; 
+  font-size: 1.4rem; 
+  font-weight: 700;
+  background: linear-gradient(to right, #38bdf8, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.badge-beta {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.header-tagline { 
+  margin: 0; 
+  color: #94a3b8; 
+  font-size: 0.85rem; 
+}
+
+.dashboard-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Sidebars */
+.sidebar {
+  width: 320px;
+  background-color: #1e293b;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border-right: 1px solid #334155;
+  z-index: 10;
+  overflow-y: auto;
+}
+.sidebar h3 { margin-top: 0; margin-bottom: 4px; color: #f8fafc; font-size: 1.1rem; }
+.subtitle { color: #94a3b8; font-size: 0.8rem; margin-top: 0; margin-bottom: 16px; }
+
+/* Left Sidebar: Hotspots */
+.left-sidebar { 
+  border-right: 1px solid #334155; 
+}
+
+.hotspot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hotspot-card {
+  background-color: #111827;
+  border: 1px solid #374151;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hotspot-card:hover { 
+  transform: translateY(-2px); 
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1); 
+}
+
+.hotspot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hotspot-card h4 { 
+  margin: 0; 
+  color: #38bdf8; 
+  font-size: 0.95rem; 
+}
+
+.growth-badge { 
+  background-color: #10b981; 
+  color: white; 
+  padding: 2px 6px; 
+  border-radius: 6px; 
+  font-size: 0.75rem; 
+  font-weight: bold; 
+}
+
+.hotspot-card .reason { 
+  margin: 0; 
+  font-size: 0.8rem; 
+  color: #94a3b8; 
+  line-height: 1.4; 
+}
+
+.hotspot-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  font-size: 0.75rem;
+  background-color: #1f2937;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #374151;
+  color: #cbd5e1;
+}
+
+.risk-low {
+  color: #34d399;
+  font-weight: 600;
+}
+
+.risk-medium {
+  color: #fb923c;
+  font-weight: 600;
+}
+
+.locate-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.locate-btn:hover {
+  background-color: #2563eb;
+}
+
+/* Main Content Area */
+.dashboard-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-color: #0f172a;
+  overflow: hidden;
+  gap: 12px;
+  min-height: 0;
+}
+
+/* Tabs */
+.tab-navigation {
+  display: flex;
+  background-color: #1e293b;
+  padding: 4px;
+  border-radius: 8px;
+  gap: 4px;
+  align-self: flex-start;
+  border: 1px solid #334155;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+
+.tab-btn:hover {
+  color: #f1f5f9;
+}
+
+.tab-btn.active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* Map Section */
+.tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.map-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+  min-height: 0;
+}
+
+.map-container-wrapper {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #334155;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  min-height: 0;
+}
+
+.map-tooltip {
+  position: absolute;
+  top: 12px;
+  left: 60px;
+  z-index: 1000;
+  background-color: rgba(15, 23, 42, 0.9);
+  border: 1px solid #3b82f6;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #38bdf8;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+.terrain-note {
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.terrain-note p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+/* Right Sidebar: Evaluation Panel */
+.right-sidebar { 
+  border-left: 1px solid #334155; 
+  width: 340px; 
+  background-color: #1e293b;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.empty-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px 20px;
+  color: #94a3b8;
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.7;
+}
+
+.analytics-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.analytics-card {
+  background-color: #111827;
+  border: 1px solid #374151;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.highlight-card {
+  border-left: 4px solid #3b82f6;
+  background: linear-gradient(135deg, #111827 0%, #1e293b 100%);
+}
+
+.card-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.coords-display {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: #f8fafc;
+}
+
+.area-badge {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.pricing-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.price-label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.price-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-top: 4px;
+}
+
+.price-growth {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #10b981;
+  margin-top: 4px;
+}
+
+.proximity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.proximity-list li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.proximity-list li strong {
+  color: #f8fafc;
+}
+
+.text-danger {
+  color: #ef4444 !important;
+}
+
+.risk-badge {
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.risk-badge.risk-low {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.risk-badge.risk-medium {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.holding-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.holding-selector label {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+}
+
+.roi-slider {
+  width: 100%;
+  cursor: pointer;
+}
+
+.projection-result {
+  background-color: #1f2937;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #374151;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.proj-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.proj-row strong {
+  color: #f8fafc;
+}
+
+.proj-row.text-success strong {
+  color: #10b981;
+}
+
+.sparkline-container {
+  border-top: 1px dashed #374151;
+  padding-top: 12px;
+}
+
+.sparkline-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.chart-dot {
+  transition: r 0.1s ease;
+}
+.chart-dot:hover {
+  r: 6;
+  cursor: pointer;
+}
+
+.plot-selector-group {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid #374151;
+  padding-top: 10px;
+}
+
+.selector-title {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.selector-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.selector-btn {
+  flex: 1;
+  background-color: #1f2937;
+  border: 1px solid #374151;
+  color: #94a3b8;
+  padding: 6px 4px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.selector-btn:hover {
+  background-color: #374151;
+  color: #f8fafc;
+}
+
+.selector-btn.active {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.unit-label-sub {
+  display: block;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+/* Responsive Design for Mobile / Tablets */
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  
+  .sidebar, .right-sidebar {
+    width: 100%;
+    border-right: none;
+    border-left: none;
+    border-bottom: 1px solid #334155;
+    max-height: 380px;
+  }
+
+  .dashboard-main {
+    overflow-y: visible;
+    height: 500px;
+  }
+}
+
+/* Fix Leaflet Geosearch Input Text Color & Visibility */
+.leaflet-control-geosearch form {
+  background-color: #ffffff !important;
+  border-radius: 4px;
+}
+
+.leaflet-control-geosearch form input {
+  color: #1e293b !important;
+  background-color: #ffffff !important;
+  font-family: 'Inter', sans-serif !important;
+  height: auto !important;
+  padding: 8px 12px !important;
+}
+
+.leaflet-control-geosearch form input::placeholder {
+  color: #64748b !important;
+}
+
+.leaflet-control-geosearch .results > * {
+  color: #1e293b !important;
+  background-color: #ffffff !important;
+  font-size: 0.85rem !important;
+}
+
+.leaflet-control-geosearch .results > :hover {
+  background-color: #f1f5f9 !important;
+}
