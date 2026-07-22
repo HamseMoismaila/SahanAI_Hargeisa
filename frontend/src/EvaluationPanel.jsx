@@ -100,6 +100,29 @@ export default function EvaluationPanel({
     onClearCompare();
   };
 
+  // Generate simple svg chart points for the trend
+  const chartPoints = [];
+  const chartHeight = 80;
+  const chartWidth = 260;
+  const years = Array.from({ length: 6 }, (_, i) => i);
+  
+  years.forEach((yr) => {
+    const val = baseValue * Math.pow(1 + growthRate, yr);
+    chartPoints.push(val);
+  });
+
+  const maxVal = Math.max(...chartPoints);
+  const minVal = Math.min(...chartPoints);
+  const valRange = maxVal - minVal || 1;
+
+  const pointsString = chartPoints
+    .map((val, idx) => {
+      const x = (idx / 5) * chartWidth;
+      const y = chartHeight - ((val - minVal) / valRange) * (chartHeight - 15) - 5;
+      return `${x},${y}`;
+    })
+    .join(' ');
+
   return (
     <div className="sidebar right-sidebar evaluation-panel">
       {/* Comparison Drawer / Section if comparison list has items */}
