@@ -202,23 +202,6 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
         Click anywhere to value, or draw a boundary using tools on the right.
       </div>
 
-      <div className="year-slider-control">
-        <div className="slider-label">Satellite Built-Up Density Layer (Year: <strong>{selectedYear}</strong>)</div>
-        <div className="slider-row">
-          <span className="year-bound">1999</span>
-          <input 
-            type="range" 
-            min="1999" 
-            max="2026" 
-            step="1" 
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-            className="year-slider"
-          />
-          <span className="year-bound">2026</span>
-        </div>
-      </div>
-
       <MapContainer 
         center={HARGEISA_COORDS} 
         zoom={13} 
