@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-app = FastAPI(title="Goobta AI Backend")
+app = FastAPI(title="Sahan AI Backend")
 
 # Allow React frontend to access the API
 app.add_middleware(

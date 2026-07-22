@@ -75,7 +75,7 @@ class NDBIProcessor:
         task = ee.batch.Export.image.toDrive(
             image=image,
             description=description,
-            folder='GoobtaAI',
+            folder='SahanAI',
             scale=10, # Sentinel-2 resolution
             region=self.roi
         )

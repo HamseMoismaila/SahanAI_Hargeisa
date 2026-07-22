@@ -1,6 +1,6 @@
-# Goobta AI: Spatial Intelligence Platform
+# Sahan AI: Spatial Intelligence Platform
 
-Goobta AI is a spatial intelligence and machine learning platform designed to predict real estate growth hotspots and automate property land valuations in Hargeisa, Somaliland. 
+Sahan AI is a spatial intelligence and machine learning platform designed to predict real estate growth hotspots and automate property land valuations in Hargeisa, Somaliland. 
 
 The application integrates satellite imagery, geographic landmarks, and environmental risk layers to deliver instant spatial valuations and returns on investment (ROI).
 
@@ -75,7 +75,7 @@ These compounding points are rendered in an inline SVG vector sparkline indicati
 ## Project Structure
 
 ```
-goobta/
+sahan_ai/
 ├── data/                      # Raw, processed spatial data, and trained model files.
 ├── frontend/                  # React + Vite dashboard client.
 │   ├── src/

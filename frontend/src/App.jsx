@@ -29,7 +29,7 @@ function App() {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <div className="header-brand">
-          <h1>Goobta AI</h1>
+          <h1>Sahan AI</h1>
           <span className="badge-beta">Spatial Intelligence</span>
         </div>
         <p className="header-tagline">Land valuation models and growth hotspot predictions in Hargeisa, Somaliland.</p>
