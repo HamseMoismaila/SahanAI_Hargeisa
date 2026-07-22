@@ -31,12 +31,13 @@ class MapRequest(BaseModel):
 @app.get("/api/ndbi_tile")
 def get_ndbi_tile(year: str = "2026"):
     """Returns the live Google Earth Engine Map ID tile URL for Hargeisa."""
-    processor = NDBIProcessor()
     try:
+        processor = NDBIProcessor()
         map_id_dict = processor.get_ndbi_map_id(year)
         return {"tile_url": map_id_dict['tile_fetcher'].url_format}
     except Exception as e:
-        return {"error": str(e)}
+        print(f"Failed to fetch Earth Engine tile for year {year}: {e}")
+        return {"error": str(e), "tile_url": None}
 
 class ChatMessage(BaseModel):
     message: str

@@ -1,5 +1,4 @@
 import ee
-
 import os
 from dotenv import load_dotenv
 
@@ -14,54 +13,75 @@ class NDBIProcessor:
         except ee.EEException:
             print("Earth Engine not authenticated. Please run 'earthengine authenticate'.")
             
-        # Hargeisa Bounding Box roughly
+        # Hargeisa Bounding Box roughly (closes properly with 5 coordinates)
         self.roi = ee.Geometry.Polygon(
             [[[43.90, 9.50], 
               [43.90, 9.60], 
               [44.10, 9.60], 
-              [44.10, 9.50]]]
+              [44.10, 9.50],
+              [43.90, 9.50]]]
         )
 
-    def calculate_ndbi(self, image):
+    def calculate_ndbi(self, image, swir_band, nir_band):
         """
         Calculates the Normalized Difference Built-Up Index (NDBI).
         NDBI = (SWIR - NIR) / (SWIR + NIR)
-        For Sentinel-2: SWIR is B11, NIR is B8
         """
-        ndbi = image.normalizedDifference(['B11', 'B8']).rename('NDBI')
+        ndbi = image.normalizedDifference([swir_band, nir_band]).rename('NDBI')
         return image.addBands(ndbi)
 
-    def get_sentinel2_collection(self, start_date: str, end_date: str) -> ee.ImageCollection:
-        """Fetch Sentinel-2 imagery for the ROI and date range."""
-        collection = (ee.ImageCollection('COPERNICUS/S2_HARMONIZED')
-                      .filterBounds(self.roi)
-                      .filterDate(start_date, end_date)
-                      .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 20))
-                      .map(self.calculate_ndbi))
+    def get_satellite_collection(self, year: int) -> ee.ImageCollection:
+        """
+        Fetches satellite imagery dynamically based on the year to support timeline checks:
+        - 2015 to 2026: Sentinel-2 (B11 SWIR, B8 NIR)
+        - 2013 to 2014: Landsat 8 (SR_B6 SWIR, SR_B5 NIR)
+        - 1999 to 2012: Landsat 7 (SR_B5 SWIR, SR_B4 NIR)
+        """
+        start_date = f"{year}-01-01"
+        end_date = f"{year}-12-31"
+
+        if year >= 2015:
+            # Sentinel-2 Harmonized
+            collection = (ee.ImageCollection('COPERNICUS/S2_HARMONIZED')
+                          .filterBounds(self.roi)
+                          .filterDate(start_date, end_date)
+                          .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 20))
+                          .map(lambda img: self.calculate_ndbi(img, 'B11', 'B8')))
+        elif year >= 2013:
+            # Landsat 8 Level 2 Surface Reflectance
+            collection = (ee.ImageCollection('LANDSAT/LC08/C02/T1_L2')
+                          .filterBounds(self.roi)
+                          .filterDate(start_date, end_date)
+                          .filter(ee.Filter.lt('CLOUD_COVER', 20))
+                          .map(lambda img: self.calculate_ndbi(img, 'SR_B6', 'SR_B5')))
+        else:
+            # Landsat 7 Level 2 Surface Reflectance
+            collection = (ee.ImageCollection('LANDSAT/LE07/C02/T1_L2')
+                          .filterBounds(self.roi)
+                          .filterDate(start_date, end_date)
+                          .filter(ee.Filter.lt('CLOUD_COVER', 20))
+                          .map(lambda img: self.calculate_ndbi(img, 'SR_B5', 'SR_B4')))
         return collection
 
     def get_ndbi_change(self, start_year: str, end_year: str) -> ee.Image:
         """
         Calculates the change in NDBI between two years to identify new construction.
         """
-        img_start = self.get_sentinel2_collection(f"{start_year}-01-01", f"{start_year}-12-31").median()
-        img_end = self.get_sentinel2_collection(f"{end_year}-01-01", f"{end_year}-12-31").median()
+        img_start = self.get_satellite_collection(int(start_year)).median()
+        img_end = self.get_satellite_collection(int(end_year)).median()
         
         ndbi_start = img_start.select('NDBI')
         ndbi_end = img_end.select('NDBI')
         
-        # Calculate change
-        ndbi_change = ndbi_end.subtract(ndbi_start).rename('NDBI_change')
-        return ndbi_change
+        return ndbi_end.subtract(ndbi_start).rename('NDBI_change')
 
     def get_ndbi_map_id(self, year: str) -> dict:
         """
-        Generates an Earth Engine Map ID for the NDBI layer, suitable for Folium rendering.
+        Generates an Earth Engine Map ID for the NDBI layer, suitable for rendering.
         """
-        img = self.get_sentinel2_collection(f"{year}-01-01", f"{year}-12-31").median()
+        img = self.get_satellite_collection(int(year)).median()
         ndbi = img.select('NDBI')
         
-        # Visualization parameters: red means highly built-up
         vis_params = {
             'min': -0.5,
             'max': 0.3,
@@ -76,15 +96,13 @@ class NDBIProcessor:
             image=image,
             description=description,
             folder='SahanAI',
-            scale=10, # Sentinel-2 resolution
+            scale=10,
             region=self.roi
         )
         task.start()
         print(f"Export task '{description}' started.")
 
 if __name__ == "__main__":
-    # Test initialization and basic operations
     processor = NDBIProcessor()
     change_img = processor.get_ndbi_change("2020", "2024")
-    # processor.export_to_drive(change_img, "Hargeisa_NDBI_Change_2020_2024")
-    print("NDBI change calculated. Uncomment export to save.")
+    print("NDBI change calculated successfully.")

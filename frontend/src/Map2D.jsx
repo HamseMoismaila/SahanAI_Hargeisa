@@ -205,12 +205,12 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
       <div className="year-slider-control">
         <div className="slider-label">Satellite Built-Up Density Layer (Year: <strong>{selectedYear}</strong>)</div>
         <div className="slider-row">
-          <span className="year-bound">2018</span>
+          <span className="year-bound">1999</span>
           <input 
             type="range" 
-            min="2018" 
+            min="1999" 
             max="2026" 
-            step="2" 
+            step="1" 
             value={selectedYear}
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
             className="year-slider"
