@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 
-export default function EvaluationPanel({ selection, prediction, selectedArea }) {
+export default function EvaluationPanel({ 
+  selection, 
+  prediction, 
+  selectedArea, 
+  comparisonList = [], 
+  onAddToCompare, 
+  onClearCompare 
+}) {
   const [holdingYears, setHoldingYears] = useState(5);
   const [plotType, setPlotType] = useState('sqm'); // 'sqm', 'small', 'large'
 
@@ -12,17 +19,7 @@ export default function EvaluationPanel({ selection, prediction, selectedArea })
     }
   }, [selectedArea]);
 
-  if (!selection) {
-    return (
-      <div className="sidebar right-sidebar empty-panel">
-        <div className="empty-state-indicator">—</div>
-        <h3>Property Insights</h3>
-        <p className="subtitle">Select a hotspot, click on the map, or draw a boundary to view instant spatial analytics.</p>
-      </div>
-    );
-  }
-
-  // Calculate simulated infrastructure distances based on coords
+  // Spatial Landmark Calculations helper
   const cityCenter = [9.5600, 44.0650];
   const university = [9.5400, 44.0200];
   const mainRoad = [9.5620, 44.0600];
@@ -36,12 +33,15 @@ export default function EvaluationPanel({ selection, prediction, selectedArea })
     );
   };
 
-  const distToCenter = calcDist([selection.lat, selection.lng], cityCenter);
-  const distToUni = calcDist([selection.lat, selection.lng], university);
-  const distToRoad = calcDist([selection.lat, selection.lng], mainRoad);
-  const distToSchool = calcDist([selection.lat, selection.lng], schools);
-  const distToMasjid = calcDist([selection.lat, selection.lng], masjid);
-  const distToLaga = calcDist([selection.lat, selection.lng], laga);
+  const getProximityData = (lat, lng) => {
+    const distToCenter = calcDist([lat, lng], cityCenter);
+    const distToUni = calcDist([lat, lng], university);
+    const distToRoad = calcDist([lat, lng], mainRoad);
+    const distToSchool = calcDist([lat, lng], schools);
+    const distToMasjid = calcDist([lat, lng], masjid);
+    const distToLaga = calcDist([lat, lng], laga);
+    return { distToCenter, distToUni, distToRoad, distToSchool, distToMasjid, distToLaga };
+  };
 
   const SMALL_PLOT_SQM = 216; // 18m x 12m
   const LARGE_PLOT_SQM = 432; // 24m x 18m
@@ -71,184 +71,225 @@ export default function EvaluationPanel({ selection, prediction, selectedArea })
   const netGain = futureValue - baseValue;
   const totalRoi = Math.round((netGain / baseValue) * 100);
 
-  const chartPoints = [];
-  const chartHeight = 80;
-  const chartWidth = 260;
-  const years = Array.from({ length: 6 }, (_, i) => i);
-  
-  years.forEach((yr) => {
-    const val = baseValue * Math.pow(1 + growthRate, yr);
-    chartPoints.push(val);
-  });
-
-  const maxVal = Math.max(...chartPoints);
-  const minVal = Math.min(...chartPoints);
-  const valRange = maxVal - minVal || 1;
-
-  const pointsString = chartPoints
-    .map((val, idx) => {
-      const x = (idx / 5) * chartWidth;
-      const y = chartHeight - ((val - minVal) / valRange) * (chartHeight - 15) - 5;
-      return `${x},${y}`;
-    })
-    .join(' ');
+  const handleCompareClick = () => {
+    if (!selection) return;
+    onAddToCompare({
+      lat: selection.lat,
+      lng: selection.lng,
+      area: activeArea,
+      plotLabel: plotType === 'sqm' ? '1 sqm' : plotType === 'small' ? '18x12m Plot' : plotType === 'large' ? '24x18m Plot' : 'Custom Plot',
+      currentPrice: currentPrice,
+      totalValue: baseValue,
+      growthRate: growthRate * 100,
+      holdingYears: holdingYears,
+      futureValue: futureValue,
+      roi: totalRoi,
+      proximity: getProximityData(selection.lat, selection.lng)
+    });
+  };
 
   return (
     <div className="sidebar right-sidebar evaluation-panel">
-      <h3>Investment Analytics</h3>
-      <p className="subtitle">Automated spatial pricing & valuation insights</p>
-
-      <div className="analytics-scroll-container">
-        {/* Selected Coordinates / Area */}
-        <div className="analytics-card">
-          <div className="card-label">Selected Location</div>
-          <div className="coords-display">
-            {selection.lat.toFixed(6)}° N, {selection.lng.toFixed(6)}° E
+      {/* Comparison Drawer / Section if comparison list has items */}
+      {comparisonList.length > 0 && (
+        <div className="comparison-drawer-container">
+          <div className="drawer-header">
+            <h4>Plot Comparison ({comparisonList.length}/2)</h4>
+            <button className="clear-compare-btn" onClick={onClearCompare}>Clear</button>
           </div>
           
-          {!selectedArea ? (
-            <div className="plot-selector-group">
-              <span className="selector-title">Select valuation unit:</span>
-              <div className="selector-buttons">
-                <button 
-                  className={`selector-btn ${plotType === 'sqm' ? 'active' : ''}`}
-                  onClick={() => setPlotType('sqm')}
-                >
-                  Per sqm
-                </button>
-                <button 
-                  className={`selector-btn ${plotType === 'small' ? 'active' : ''}`}
-                  onClick={() => setPlotType('small')}
-                >
-                  Small Plot (18×12m)
-                </button>
-                <button 
-                  className={`selector-btn ${plotType === 'large' ? 'active' : ''}`}
-                  onClick={() => setPlotType('large')}
-                >
-                  Large Plot (24×18m)
-                </button>
+          <div className="comparison-slots-layout">
+            {comparisonList.map((item, idx) => (
+              <div key={idx} className="comparison-card">
+                <div className="comp-title">Plot {idx + 1} ({item.plotLabel})</div>
+                <div className="comp-metric">Valuation: <strong>${item.totalValue.toLocaleString()}</strong></div>
+                <div className="comp-metric">Growth: <strong className="text-success">+{item.growthRate.toFixed(1)}%</strong></div>
+                <div className="comp-metric">ROI ({item.holdingYears} yr): <strong className="text-success">{item.roi}%</strong></div>
+                <div className="comp-metric">Center: <strong>{(item.proximity.distToCenter / 1000).toFixed(2)} km</strong></div>
+                <div className="comp-metric">Road: <strong>{(item.proximity.distToRoad / 1000).toFixed(2)} km</strong></div>
+                <div className="comp-metric">Masjid: <strong>{item.proximity.distToMasjid} m</strong></div>
+              </div>
+            ))}
+            
+            {comparisonList.length === 1 && (
+              <div className="comparison-card empty-card">
+                <p>Select another area and click "Add to Compare" to see side-by-side stats</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Main Single Location Insights */}
+      {!selection ? (
+        <div className="empty-panel">
+          <div className="empty-state-indicator">—</div>
+          <h3>Property Insights</h3>
+          <p className="subtitle">Select a hotspot, click on the map, or draw a boundary to view instant spatial analytics.</p>
+        </div>
+      ) : (
+        <>
+          <div className="evaluation-header-section">
+            <h3>Investment Analytics</h3>
+            <p className="subtitle">Automated spatial pricing & valuation insights</p>
+            <button className="add-compare-btn" onClick={handleCompareClick}>
+              + Add to Compare List
+            </button>
+          </div>
+
+          <div className="analytics-scroll-container">
+            {/* Selected Coordinates / Area */}
+            <div className="analytics-card">
+              <div className="card-label">Selected Location</div>
+              <div className="coords-display">
+                {selection.lat.toFixed(6)}° N, {selection.lng.toFixed(6)}° E
+              </div>
+              
+              {!selectedArea ? (
+                <div className="plot-selector-group">
+                  <span className="selector-title">Select valuation unit:</span>
+                  <div className="selector-buttons">
+                    <button 
+                      className={`selector-btn ${plotType === 'sqm' ? 'active' : ''}`}
+                      onClick={() => setPlotType('sqm')}
+                    >
+                      Per sqm
+                    </button>
+                    <button 
+                      className={`selector-btn ${plotType === 'small' ? 'active' : ''}`}
+                      onClick={() => setPlotType('small')}
+                    >
+                      Small Plot (18×12m)
+                    </button>
+                    <button 
+                      className={`selector-btn ${plotType === 'large' ? 'active' : ''}`}
+                      onClick={() => setPlotType('large')}
+                    >
+                      Large Plot (24×18m)
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="area-badge">
+                  Boundary Area: <strong>{Math.round(selectedArea).toLocaleString()} sqm</strong>
+                </div>
+              )}
+            </div>
+
+            {/* Pricing Metrics */}
+            <div className="analytics-card highlight-card">
+              <div className="card-label">Estimated Valuation</div>
+              <div className="pricing-row">
+                <div>
+                  <span className="price-label">Current Value</span>
+                  <div className="price-value">${baseValue.toLocaleString()}</div>
+                  <span className="unit-label-sub">{sizeLabel}</span>
+                </div>
+                <div>
+                  <span className="price-label">Growth Rate (pa)</span>
+                  <div className="price-growth">{prediction ? `+${prediction.growth_rate_pct}%` : 'Calculating...'}</div>
+                </div>
               </div>
             </div>
-          ) : (
-            <div className="area-badge">
-              Boundary Area: <strong>{Math.round(selectedArea).toLocaleString()} sqm</strong>
-            </div>
-          )}
-        </div>
 
-        {/* Pricing Metrics */}
-        <div className="analytics-card highlight-card">
-          <div className="card-label">Estimated Valuation</div>
-          <div className="pricing-row">
-            <div>
-              <span className="price-label">Current Value</span>
-              <div className="price-value">${baseValue.toLocaleString()}</div>
-              <span className="unit-label-sub">{sizeLabel}</span>
+            {/* Spatial Infrastructure Features */}
+            <div className="analytics-card">
+              <div className="card-label">Spatial Proximity</div>
+              <ul className="proximity-list">
+                <li>
+                  <span>Distance to Sha'ab (Center)</span>
+                  <strong>{(getProximityData(selection.lat, selection.lng).distToCenter / 1000).toFixed(2)} km</strong>
+                </li>
+                <li>
+                  <span>Proximity to Hargeisa Univ.</span>
+                  <strong>{(getProximityData(selection.lat, selection.lng).distToUni / 1000).toFixed(2)} km</strong>
+                </li>
+                <li>
+                  <span>Proximity to Main Highway</span>
+                  <strong>{(getProximityData(selection.lat, selection.lng).distToRoad / 1000).toFixed(2)} km</strong>
+                </li>
+                <li>
+                  <span>Proximity to Schools</span>
+                  <strong>{(getProximityData(selection.lat, selection.lng).distToSchool / 1000).toFixed(2)} km</strong>
+                </li>
+                <li>
+                  <span>Proximity to Masjid</span>
+                  <strong>{getProximityData(selection.lat, selection.lng).distToMasjid} m</strong>
+                </li>
+                <li>
+                  <span>Proximity to Laga (Riverbed)</span>
+                  <strong className={getProximityData(selection.lat, selection.lng).distToLaga < 500 ? "text-danger" : ""}>
+                    {getProximityData(selection.lat, selection.lng).distToLaga} m
+                  </strong>
+                </li>
+                <li>
+                  <span>Flood Vulnerability Risk</span>
+                  <span className={`risk-badge ${getProximityData(selection.lat, selection.lng).distToLaga < 500 ? "risk-medium" : "risk-low"}`}>
+                    {getProximityData(selection.lat, selection.lng).distToLaga < 500 ? "Moderate" : "Low Risk"}
+                  </span>
+                </li>
+              </ul>
             </div>
-            <div>
-              <span className="price-label">Growth Rate (pa)</span>
-              <div className="price-growth">{prediction ? `+${prediction.growth_rate_pct}%` : 'Calculating...'}</div>
-            </div>
-          </div>
-        </div>
 
-        {/* Spatial Infrastructure Features */}
-        <div className="analytics-card">
-          <div className="card-label">Spatial Proximity</div>
-          <ul className="proximity-list">
-            <li>
-              <span>Distance to Sha'ab (Center)</span>
-              <strong>{(distToCenter / 1000).toFixed(2)} km</strong>
-            </li>
-            <li>
-              <span>Proximity to Hargeisa Univ.</span>
-              <strong>{(distToUni / 1000).toFixed(2)} km</strong>
-            </li>
-            <li>
-              <span>Proximity to Main Highway</span>
-              <strong>{(distToRoad / 1000).toFixed(2)} km</strong>
-            </li>
-            <li>
-              <span>Proximity to Schools</span>
-              <strong>{(distToSchool / 1000).toFixed(2)} km</strong>
-            </li>
-            <li>
-              <span>Proximity to Masjid</span>
-              <strong>{distToMasjid} m</strong>
-            </li>
-            <li>
-              <span>Proximity to Laga (Riverbed)</span>
-              <strong className={distToLaga < 500 ? "text-danger" : ""}>
-                {distToLaga} m
-              </strong>
-            </li>
-            <li>
-              <span>Flood Vulnerability Risk</span>
-              <span className={`risk-badge ${distToLaga < 500 ? "risk-medium" : "risk-low"}`}>
-                {distToLaga < 500 ? "Moderate" : "Low Risk"}
-              </span>
-            </li>
-          </ul>
-        </div>
+            {/* Interactive Growth Projection Slider */}
+            <div className="analytics-card">
+              <div className="card-label">Holding ROI Projection</div>
+              <div className="holding-selector">
+                <label>Hold Period: <strong>{holdingYears} Years</strong></label>
+                <input 
+                  type="range" 
+                  min="1" 
+                  max="15" 
+                  value={holdingYears}
+                  onChange={(e) => setHoldingYears(parseInt(e.target.value))}
+                  className="roi-slider"
+                />
+              </div>
+              
+              <div className="projection-result">
+                <div className="proj-row">
+                  <span>Value in Year {holdingYears}:</span>
+                  <strong>${futureValue.toLocaleString()}</strong>
+                </div>
+                <div className="proj-row text-success">
+                  <span>Estimated Return:</span>
+                  <strong>+${netGain.toLocaleString()} ({totalRoi}%)</strong>
+                </div>
+              </div>
 
-        {/* Interactive Growth Projection Slider */}
-        <div className="analytics-card">
-          <div className="card-label">Holding ROI Projection</div>
-          <div className="holding-selector">
-            <label>Hold Period: <strong>{holdingYears} Years</strong></label>
-            <input 
-              type="range" 
-              min="1" 
-              max="15" 
-              value={holdingYears}
-              onChange={(e) => setHoldingYears(parseInt(e.target.value))}
-              className="roi-slider"
-            />
-          </div>
-          
-          <div className="projection-result">
-            <div className="proj-row">
-              <span>Value in Year {holdingYears}:</span>
-              <strong>${futureValue.toLocaleString()}</strong>
-            </div>
-            <div className="proj-row text-success">
-              <span>Estimated Return:</span>
-              <strong>+${netGain.toLocaleString()} ({totalRoi}%)</strong>
-            </div>
-          </div>
-
-          {/* Sparkline Graph */}
-          <div className="sparkline-container">
-            <svg width="100%" height="80" viewBox={`0 0 ${chartWidth} ${chartHeight}`}>
-              <polyline
-                fill="none"
-                stroke="#3b82f6"
-                strokeWidth="3"
-                points={pointsString}
-              />
-              {chartPoints.map((val, idx) => {
-                const x = (idx / 5) * chartWidth;
-                const y = chartHeight - ((val - minVal) / valRange) * (chartHeight - 15) - 5;
-                return (
-                  <circle
-                    key={idx}
-                    cx={x}
-                    cy={y}
-                    r="4"
-                    fill="#3b82f6"
-                    className="chart-dot"
+              {/* Sparkline Graph */}
+              <div className="sparkline-container">
+                <svg width="100%" height="80" viewBox={`0 0 ${chartWidth} ${chartHeight}`}>
+                  <polyline
+                    fill="none"
+                    stroke="#3b82f6"
+                    strokeWidth="3"
+                    points={pointsString}
                   />
-                );
-              })}
-            </svg>
-            <div className="sparkline-labels">
-              <span>Today</span>
-              <span>Yr 5</span>
+                  {chartPoints.map((val, idx) => {
+                    const x = (idx / 5) * chartWidth;
+                    const y = chartHeight - ((val - minVal) / valRange) * (chartHeight - 15) - 5;
+                    return (
+                      <circle
+                        key={idx}
+                        cx={x}
+                        cy={y}
+                        r="4"
+                        fill="#3b82f6"
+                        className="chart-dot"
+                      />
+                    );
+                  })}
+                </svg>
+                <div className="sparkline-labels">
+                  <span>Today</span>
+                  <span>Yr 5</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

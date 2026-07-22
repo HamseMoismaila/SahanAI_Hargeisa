@@ -11,6 +11,9 @@ function App() {
   const [predictionData, setPredictionData] = useState(null);
   const [selectedArea, setSelectedArea] = useState(null);
   const [flyToCoords, setFlyToCoords] = useState(null);
+  
+  // State for side-by-side plot comparison
+  const [comparisonList, setComparisonList] = useState([]);
 
   const handleSelectHotspot = (coords, name, info) => {
     setFlyToCoords(coords);
@@ -23,6 +26,20 @@ function App() {
     setSelectedLocation(latlng);
     setSelectedArea(areaVal);
     setPredictionData(prediction);
+  };
+
+  const handleAddToCompare = (plotData) => {
+    setComparisonList(prev => {
+      if (prev.length >= 2) {
+        // Shift out the older one to keep max 2
+        return [prev[1], plotData];
+      }
+      return [...prev, plotData];
+    });
+  };
+
+  const handleClearCompare = () => {
+    setComparisonList([]);
   };
 
   return (
@@ -51,11 +68,14 @@ function App() {
           </section>
         </main>
 
-        {/* Right Sidebar - Analytics Panel */}
+        {/* Right Sidebar - Analytics & Comparison Panel */}
         <EvaluationPanel 
           selection={selectedLocation} 
           prediction={predictionData} 
           selectedArea={selectedArea}
+          comparisonList={comparisonList}
+          onAddToCompare={handleAddToCompare}
+          onClearCompare={handleClearCompare}
         />
       </div>
     </div>

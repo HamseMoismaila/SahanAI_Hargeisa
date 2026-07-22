@@ -163,18 +163,23 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
   const [hotspots, setHotspots] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [prediction, setPrediction] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(2026);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/ndbi_tile?year=2026')
-      .then(res => res.json())
-      .then(data => { if (data.tile_url) setNdbiTileUrl(data.tile_url); })
-      .catch(err => console.error(err));
-
+    // Only fetch hotspots list once on mount
     fetch('http://localhost:8080/api/hotspots')
       .then(res => res.json())
       .then(data => setHotspots(data))
       .catch(err => console.error(err));
   }, []);
+
+  useEffect(() => {
+    setNdbiTileUrl(''); // Reset tiles to display correct loading sequence
+    fetch(`http://localhost:8080/api/ndbi_tile?year=${selectedYear}`)
+      .then(res => res.json())
+      .then(data => { if (data.tile_url) setNdbiTileUrl(data.tile_url); })
+      .catch(err => console.error(err));
+  }, [selectedYear]);
 
   useEffect(() => {
     if (!selectedLocation) return;
@@ -195,6 +200,23 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
     <div className="map-container-wrapper">
       <div className="map-tooltip">
         Click anywhere to value, or draw a boundary using tools on the right.
+      </div>
+
+      <div className="year-slider-control">
+        <div className="slider-label">Satellite Built-Up Density Layer (Year: <strong>{selectedYear}</strong>)</div>
+        <div className="slider-row">
+          <span className="year-bound">2018</span>
+          <input 
+            type="range" 
+            min="2018" 
+            max="2026" 
+            step="2" 
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+            className="year-slider"
+          />
+          <span className="year-bound">2026</span>
+        </div>
       </div>
 
       <MapContainer 
