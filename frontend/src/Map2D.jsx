@@ -10,7 +10,8 @@ import {
   useMapEvents,
   LayersControl,
   FeatureGroup,
-  Polyline
+  Polyline,
+  Polygon
 } from 'react-leaflet';
 import { GeoSearchControl, OpenStreetMapProvider, GoogleProvider } from 'leaflet-geosearch';
 import { area } from '@turf/area';
@@ -54,6 +55,40 @@ const HWA_PIPELINES = [
 const LAGA_CHANNELS = [
   // Main dry riverbed channel winding through Hargeisa center dividing the city north/south
   [[9.5520, 44.0000], [9.5540, 44.0250], [9.5560, 44.0500], [9.5620, 44.0670], [9.5650, 44.0850], [9.5720, 44.1100], [9.5780, 44.1400]]
+];
+
+// Soil Zones mapped in Hargeisa for Developers (Limestone rock in North vs Clay in South)
+const SOIL_ZONES = [
+  {
+    name: "Northern Limestone Ridge (Hard Excavation Rock)",
+    color: "#d97706",
+    coords: [
+      [9.5750, 43.8800],
+      [9.6800, 43.8800],
+      [9.6800, 44.2200],
+      [9.5750, 44.2200]
+    ]
+  },
+  {
+    name: "Southern Clay & Silt Plain (Standard Loam Soil)",
+    color: "#059669",
+    coords: [
+      [9.4200, 43.8800],
+      [9.5749, 43.8800],
+      [9.5749, 44.2200],
+      [9.4200, 44.2200]
+    ]
+  }
+];
+
+// Newly graded and asphalted roads in the last 4 years (Mooge Administration Roads)
+const NEW_ROADS = [
+  // Hargeisa Bypass highway (completed corridor in south-east bypass)
+  [[9.5200, 44.0200], [9.5220, 44.0500], [9.5300, 44.0800], [9.5420, 44.1100], [9.5520, 44.1400]],
+  // 150 Road expansion (North-east connecting ring road)
+  [[9.5850, 44.0150], [9.5820, 44.0450], [9.5810, 44.0750], [9.5780, 44.1050]],
+  // Jigjiga Yar new commercial inner tarmac road links
+  [[9.5700, 44.0300], [9.5780, 44.0320], [9.5840, 44.0350]]
 ];
 
 // Search Component with Google Maps geocoding integration
@@ -278,6 +313,11 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
     setMeasurePoints(prev => [...prev, latlng]);
   };
 
+  // Generate parallel corridor line arrays flanking Dooxa
+  const dooxaPath = LAGA_CHANNELS[0];
+  const northParallelPath = dooxaPath.map(pt => [pt[0] + 0.0035, pt[1]]);
+  const southParallelPath = dooxaPath.map(pt => [pt[0] - 0.0035, pt[1]]);
+
   return (
     <div className="map-container-wrapper">
       <div className="map-tooltip">
@@ -376,31 +416,71 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
             </FeatureGroup>
           </LayersControl.Overlay>
 
-          {/* Laga Flood Risk Channels Overlay */}
-          <LayersControl.Overlay checked name="Laga Flood Risk Channels">
+          {/* Soil Zones Overlay */}
+          <LayersControl.Overlay name="Excavation Soil Zones">
             <FeatureGroup>
-              {/* 500m Active Flood Risk Buffer Zone Corridor (Meters-based Scale-aware) */}
-              {LAGA_CHANNELS[0].map((coords, idx) => (
-                <Circle
-                  key={`buffer-${idx}`}
-                  center={coords}
-                  radius={500}
-                  pathOptions={{ color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.08, weight: 0 }}
-                  interactive={false}
-                />
+              {SOIL_ZONES.map((zone, idx) => (
+                <Polygon
+                  key={idx}
+                  positions={zone.coords}
+                  pathOptions={{ color: zone.color, fillColor: zone.color, fillOpacity: 0.08, weight: 1.5, dashArray: '5, 5' }}
+                >
+                  <Popup>
+                    <div style={{ color: '#1e293b' }}>
+                      <strong>{zone.name}</strong>
+                    </div>
+                  </Popup>
+                </Polygon>
               ))}
+            </FeatureGroup>
+          </LayersControl.Overlay>
+
+          {/* New Roads Overlay */}
+          <LayersControl.Overlay checked name="New Roads (Last 4 Years)">
+            <FeatureGroup>
+              {NEW_ROADS.map((road, idx) => (
+                <Polyline
+                  key={idx}
+                  positions={road}
+                  pathOptions={{ color: '#f97316', weight: 3.5, opacity: 0.9 }}
+                >
+                  <Popup>
+                    <div style={{ color: '#1e293b' }}>
+                      <strong>Newly Constructed Road</strong>
+                      <p style={{ margin: '4px 0', fontSize: '0.85em', color: '#ea580c' }}>Graded/Asphalted by Municipal Council (2022-2026)</p>
+                    </div>
+                  </Popup>
+                </Polyline>
+              ))}
+            </FeatureGroup>
+          </LayersControl.Overlay>
+
+          {/* Laga Flood Risk Channels Overlay with parallel boundaries */}
+          <LayersControl.Overlay checked name="Laga Flood Risk (Dooxa)">
+            <FeatureGroup>
+              {/* Parallel Boundary 1 (North Side) */}
+              <Polyline 
+                positions={northParallelPath} 
+                pathOptions={{ color: '#ef4444', weight: 2.5, opacity: 0.8, dashArray: '5, 5' }} 
+              />
+              
+              {/* Parallel Boundary 2 (South Side) */}
+              <Polyline 
+                positions={southParallelPath} 
+                pathOptions={{ color: '#ef4444', weight: 2.5, opacity: 0.8, dashArray: '5, 5' }} 
+              />
               
               {/* Dashed Centerline of the Dooxa */}
               {LAGA_CHANNELS.map((line, idx) => (
                 <Polyline 
                   key={idx} 
                   positions={line} 
-                  pathOptions={{ color: '#ef4444', weight: 4, opacity: 0.75, dashArray: '8, 8' }} 
+                  pathOptions={{ color: '#b91c1c', weight: 4.5, opacity: 0.85 }} 
                 >
                   <Popup>
                     <div style={{ color: '#1e293b' }}>
                       <strong>Active Laga (Dooxa Hargeisa)</strong>
-                      <p style={{ margin: '4px 0', fontSize: '0.85em', color: '#b91c1c' }}>High Flash-Flood Risk Area (500m Buffer Surcharge / Valuation Penalty)</p>
+                      <p style={{ margin: '4px 0', fontSize: '0.85em', color: '#b91c1c' }}>High Flood-Vulnerability Corridor (Fenced by parallel bounds)</p>
                     </div>
                   </Popup>
                 </Polyline>
