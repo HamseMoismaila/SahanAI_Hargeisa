@@ -14,22 +14,21 @@ The core pricing engine combines spatial metrics to dynamically estimate land va
   $$\text{Base Price} = 250 \cdot e^{-\frac{\text{Distance to Center}}{3000\text{ meters}}}$$
 * **Institutional Premium (University)**: Locations near Hargeisa University gain an additional demand premium:
   $$\text{University Premium} = 40 \cdot e^{-\frac{\text{Distance to University}}{1500\text{ meters}}}$$
-* **Highway Proximity (Main Highway)**: Proximity to arterial transit corridors provides commercial value:
+* **Highway Proximity (Main Highway)**: Proximity to arterial transit corridors (e.g. Bypass, 150 Road, Taiwan Avenue) provides commercial value:
   $$\text{Road Premium} = 50 \cdot e^{-\frac{\text{Distance to Highway}}{1000\text{ meters}}}$$
 * **Education Proximity (Schools)**: Proximity to major primary and international school clusters adds residential value:
   $$\text{School Premium} = 30 \cdot e^{-\frac{\text{Distance to Schools}}{1200\text{ meters}}}$$
 * **Masjid Proximity (Community)**: Proximity to a neighborhood Masjid adds a premium for residential demand:
   $$\text{Masjid Premium} = 25 \cdot e^{-\frac{\text{Distance to Masjid}}{400\text{ meters}}}$$
-* **Natural Hazard Proximity (Lagas)**: Real estate values are penalized by up to **30%** if the coordinates fall within `500 meters` of a dry riverbed (Laga) to account for flash flood vulnerabilities:
-  $$\text{Penalty Multiplier} = 0.7 + 0.3 \cdot \left(\frac{\text{Distance to Laga}}{500}\right)$$
+* **Natural Hazard Proximity (Dooxa/Lagas)**: Real estate values are penalized by up to **30%** if the coordinates fall within `500 meters` of the winding dry riverbed (Dooxa Hargeisa) to account for seasonal flash flood vulnerabilities:
+  $$\text{Penalty Multiplier} = 0.7 + 0.3 \cdot \left(\frac{\text{Distance to Dooxa}}{500}\right)$$
 
-### 2. Machine Learning Pipeline (XGBoost)
-The backend leverages an XGBoost Regressor model (`xgb.XGBRegressor`) trained on structural spatial features:
-1. `ndbi_change`: Normalized Difference Built-Up Index change over time (derived from Sentinel-2 satellite imagery) to index construction density.
-2. `dist_to_road` / `dist_to_highway`: Proximity to arterial road networks.
-3. `dist_to_center`: Distance to the city center.
-4. `dist_to_university`: Distance to educational institutions.
-5. `dist_to_laga`: Proximity to local hydrology streams.
+### 2. Localized Utility & Construction Surcharges
+To provide Hargeisa developers with actionable analysis, the platform computes:
+* **Water Supply Network (FAO SWALIM & HWA)**: Classifies plots based on Hargeisa Water Agency pipeline coverage. Plots within 2.5km of central trunks are labeled `Piped Municipal (HWA Network)` (low cost), while outlying zones default to `Private Water Truck Basin` (dependent on Booyad deliveries).
+* **Access Road Classification**: Classifies connection access roads into `Paved Asphalt (Laami)`, `Graded Gravel (Carro-Cad)`, or `Unpaved Dirt Track` based on highway node proximity.
+* **Topography & Foundation Cost Surcharge (NASA SRTM DEM)**: Estimates local slope gradients. Slopes $\ge$ 8.0% trigger a **+25% construction surcharge** (retaining walls required), while slopes 3.5% - 8.0% trigger a **+10% surcharge** (moderate grading required).
+* **Excavation Soil Profile**: Classifies soil into `Hard Limestone Rock` (northern ridges requiring hydraulic jackhammer excavation), `Soft Sandy Soil` (dooxa margins), or `Clay & Silt Mix` (southern plains).
 
 ---
 
@@ -38,20 +37,14 @@ The backend leverages an XGBoost Regressor model (`xgb.XGBRegressor`) trained on
 The platform calculates valuations and investment returns in three stages:
 
 ### Stage 1: Spatial Proximity & Pricing Engine (Backend)
-When a coordinate is queried on the map, the backend ([train_model.py](file:///C:/Users/User/OneDrive%20-%20Nilai%20University/Desktop/goobta/src/models/train_model.py)) computes the Euclidean distance (converted to meters using the UTM scale factor) between the selected point and primary Hargeisa landmarks:
-* **Sha'ab (City Center)**: `(9.5600, 44.0650)`
-* **Hargeisa University**: `(9.5400, 44.0200)`
-* **Main Road (Highway)**: `(9.5620, 44.0600)`
-* **School Cluster**: `(9.5500, 44.0400)`
-* **Masjid Cluster**: `(9.5580, 44.0550)`
-* **Major Laga (Dry River)**: `(9.5550, 44.0700)`
+When a coordinate is queried on the map, the backend ([train_model.py](file:///C:/Users/User/OneDrive%20-%20Nilai%20University/Desktop/goobta/src/models/train_model.py)) computes the Euclidean distance (converted to meters using the UTM scale factor) between the selected point and primary Hargeisa landmarks and infrastructure nodes.
 
-$$\text{Current Price per sqm} = (\text{Base Price} + \text{University Premium} + \text{Road Premium} + \text{School Premium} + \text{Masjid Premium}) \times \text{Laga Penalty Multiplier}$$
+$$\text{Current Price per sqm} = (\text{Base Price} + \text{University Premium} + \text{Road Premium} + \text{School Premium} + \text{Masjid Premium}) \times \text{Dooxa Penalty Multiplier}$$
 
 ### Stage 2: Compounding Appreciation Rate
 The annual growth rate is dynamically simulated based on urban expansion corridors:
 * Saturated central zones grow at a stable **5% to 8%** rate.
-* Outlying development corridors (such as areas close to the university and highway networks) receive development bonuses, compounding growth up to **15% to 25%** annually.
+* Outlying development corridors (such as areas close to the university, bypass, and highway networks) receive development bonuses, compounding growth up to **15% to 25%** annually.
 
 $$\text{Next Year Price} = \text{Current Price} \times (1 + \text{Appreciation Rate})$$
 
@@ -65,10 +58,15 @@ The React frontend ([EvaluationPanel.jsx](file:///C:/Users/User/OneDrive%20-%20N
 The future value is compounded annually for the user-selected holding period ($n$ years):
 
 $$\text{Future Value} = \text{Current Value} \times (1 + \text{Appreciation Rate})^n$$
-$$\text{Estimated Return} = \text{Future Value} - \text{Current Value}$$
-$$\text{Return on Investment (ROI \%)} = \left(\frac{\text{Estimated Return}}{\text{Current Value}}\right) \times 100$$
 
-These compounding points are rendered in an inline SVG vector sparkline indicating the property valuation trend over the holding period.
+---
+
+## Map Layer Controls & Overlays
+The Leaflet map cockpit integrates togglable layers via a Layer Control in the top-right corner:
+1. **Google Satellite (Hybrid)**: Default high-resolution base imagery.
+2. **HWA Water Pipelines**: Cites HWA & UN-Habitat pipeline mapping. Drawn as vibrant blue lines.
+3. **Laga Flood Risk (Dooxa)**: Renders the central winding dry riverbed and draws parallel red boundary lines representing the 500-meter buffer zone boundaries flanking the Dooxa.
+4. **Excavation Soil Zones**: Polygons outlining the Northern Limestone Bedrock (Hard Rock) and Southern Alluvial Clay Plains.
 
 ---
 
@@ -80,9 +78,9 @@ sahan_ai/
 ├── frontend/                  # React + Vite dashboard client.
 │   ├── src/
 │   │   ├── App.jsx            # Main cockpit entry layout.
-│   │   ├── Map2D.jsx          # Leaflet map loaded with Google Maps Hybrid layer.
-│   │   ├── HotspotsSidebar.jsx# List of ML-predicted high-growth zones.
-│   │   ├── EvaluationPanel.jsx# ROI projection slider, SVG trend lines, & proximity stats.
+│   │   ├── Map2D.jsx          # Leaflet map loaded with layers controls & measuring tools.
+│   │   ├── HotspotsSidebar.jsx# List of ML-predicted high-growth zones (e.g. Mohamed Mooge).
+│   │   ├── EvaluationPanel.jsx# ROI projection slider, side-by-side comparison, & sources.
 │   │   ├── App.css            # Dark premium stylesheet (Inter font family).
 │   │   └── main.jsx
 │   └── package.json
@@ -90,7 +88,7 @@ sahan_ai/
 │   ├── api/
 │   │   └── server.py          # FastAPI web server serving predictions and hotspots.
 │   ├── gee_pipeline/
-│   │   └── ndbi_processor.py  # Google Earth Engine Sentinel-2 imagery processing.
+│   │   └── ndbi_processor.py  # Google Earth Engine satellite imagery processing.
 │   ├── features/
 │   │   ├── spatial_joiner.py  # GeoPandas metric coordinate conversions.
 │   │   └── hydrology.py       # DEM-based flow routing and river proximity extractor.
@@ -138,8 +136,7 @@ Open [http://localhost:5173/](http://localhost:5173/) in your web browser to acc
 ---
 
 ## How to Use the Dashboard
-1. **Interactive Navigation**: Drag and zoom on the **Google Maps Satellite/Hybrid** interface. Standard labels are overlaid natively.
-2. **Instant Point Valuation**: Click any point on the map to query the machine learning pricing model.
-3. **Select Lot Dimensions**: Under *Selected Location* in the right panel, select **Per sqm**, **Small Plot (18m × 12m)**, or **Large Plot (24m × 18m)** to scale valuations.
-4. **Draw Custom Boundaries**: Use the polygon/rectangle drawing toolbar on the top-right of the map to trace custom properties. It computes the total square meters and outputs the exact total plot evaluation.
-5. **Simulate Growth Hold**: Move the *Hold Period* slider in the right panel to dynamically compound interest rates and simulate ROI holding graphs over 1-15 years.
+1. **Interactive Navigation**: Drag and zoom on the Google Maps satellite interface. The map is locked focus to Hargeisa bounds.
+2. **Instant Point Valuation**: Click any point on the map to query pricing, soil excavation types, slope, and water access feasibility.
+3. **Compare Plots**: Select a plot and click **"+ Add to Compare List"** to save it. Select a second plot and add it to see side-by-side comparison stats (Value, ROI, Water, Road access, Soil, and Surcharges) in the right sidebar.
+4. **Measure Distance**: Click the **"Measure Distance"** button in the bottom-left map corner. Click points on the map to draw a path and calculate geodesic distance. Click **"Reset"** to clear the path.
