@@ -186,7 +186,8 @@ class GrowthPredictor:
             {"name": "Sha'ab (City Center)", "lat": 9.560, "lon": 44.065, "reason": "Premium commercial real estate. Stable, high base value.", "growth": "+8%"},
             {"name": "Masalaha (South Airport Road)", "lat": 9.515, "lon": 44.078, "reason": "New infrastructure developments pushing land value up.", "growth": "+18%"},
             {"name": "Ibrahim Koodbuur", "lat": 9.585, "lon": 44.052, "reason": "Growing residential demand driving consistent appreciation.", "growth": "+14%"},
-            {"name": "Hargeisa Club Area", "lat": 9.561, "lon": 44.069, "reason": "Historic high-value residential blocks.", "growth": "+10%"}
+            {"name": "Hargeisa Club Area", "lat": 9.561, "lon": 44.069, "reason": "Historic high-value residential blocks.", "growth": "+10%"},
+            {"name": "Mohamed Mooge District", "lat": 9.535, "lon": 44.088, "reason": "Rapidly growing residential sector linked to the new Hargeisa Bypass corridor and diaspora housing.", "growth": "+19%"}
         ]
         
         features = []

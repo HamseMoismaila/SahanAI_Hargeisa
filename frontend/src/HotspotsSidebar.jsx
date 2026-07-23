@@ -24,7 +24,8 @@ export default function HotspotsSidebar({ onSelectHotspot }) {
     "Sha'ab (City Center)": { zone: "Government & Premium Retail", risk: "No Flood Risk", elevation: "1,270m", density: "Very High" },
     "Masalaha (South Airport Road)": { zone: "Light Industrial/Residential", risk: "Low Risk", elevation: "1,310m", density: "Medium" },
     "Ibrahim Koodbuur": { zone: "Residential Suburb", risk: "Medium Risk (near Laga)", elevation: "1,280m", density: "Medium-High" },
-    "Hargeisa Club Area": { zone: "High-value Historical", risk: "Low Risk", elevation: "1,265m", density: "High" }
+    "Hargeisa Club Area": { zone: "High-value Historical", risk: "Low Risk", elevation: "1,265m", density: "High" },
+    "Mohamed Mooge District": { zone: "Rapidly Expanding Residential", risk: "Low Risk", elevation: "1,250m", density: "High" }
   };
 
   if (loading) return <div className="sidebar left-sidebar">Loading hotspots...</div>;
