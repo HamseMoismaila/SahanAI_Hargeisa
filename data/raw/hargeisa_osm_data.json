@@ -1,0 +1,1224 @@
+{
+    "version": 0.6,
+    "generator": "Overpass API 0.7.62.11 87bfad18",
+    "osm3s": {
+        "timestamp_osm_base": "2026-07-23T15:43:02Z",
+        "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+    },
+    "elements": [
+        {
+            "type": "node",
+            "id": 1138798765,
+            "lat": 9.5636512,
+            "lon": 44.0626114,
+            "tags": {
+                "amenity": "place_of_worship",
+                "religion": "muslim"
+            }
+        },
+        {
+            "type": "node",
+            "id": 1138799115,
+            "lat": 9.5614165,
+            "lon": 44.1205776,
+            "tags": {
+                "amenity": "place_of_worship",
+                "religion": "muslim"
+            }
+        },
+        {
+            "type": "node",
+            "id": 2373721797,
+            "lat": 9.5602116,
+            "lon": 44.0662408,
+            "tags": {
+                "addr:city": "\u0647\u0631\u062c\u064a\u0633\u0627",
+                "amenity": "place_of_worship",
+                "denomination": "sunni",
+                "name": "Masjid \u0645\u0633\u062c\u062f",
+                "name:ar": "\u0645\u0633\u062c\u062f",
+                "name:en": "Masjid",
+                "religion": "muslim"
+            }
+        },
+        {
+            "type": "node",
+            "id": 2375346640,
+            "lat": 9.5602326,
+            "lon": 44.0697699,
+            "tags": {
+                "addr:city": "\u0647\u0631\u062c\u064a\u0633\u0627",
+                "amenity": "place_of_worship",
+                "denomination": "sunni",
+                "name": "Masjid \u0645\u0633\u062c\u062f",
+                "name:ar": "\u0645\u0633\u062c\u062f",
+                "name:en": "Masjid",
+                "religion": "muslim"
+            }
+        },
+        {
+            "type": "node",
+            "id": 2376106088,
+            "lat": 9.5612262,
+            "lon": 44.0565228,
+            "tags": {
+                "addr:city": "\u0647\u0631\u062c\u064a\u0633\u0627",
+                "amenity": "place_of_worship",
+                "denomination": "sunni",
+                "name": "\u0645\u0633\u062c\u062f",
+                "name:ar": "\u0645\u0633\u062c\u062f",
+                "name:en": "Masjid",
+                "religion": "muslim"
+            }
+        },
+        {
+            "type": "node",
+            "id": 2376106096,
+            "lat": 9.5613567,
+            "lon": 44.0639408,
+            "tags": {
+                "amenity": "place_of_worship",
+                "denomination": "sunni",
+                "name": "Masjid",
+                "religion": "muslim"
+            }
+        },
+        {
+            "type": "node",
+            "id": 2794110273,
+            "lat": 9.5718252,
+            "lon": 44.0631732,
+            "tags": {
+                "addr:city": "hargeisa",
+                "amenity": "school",
+                "name": "biyo dhacay school"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3574051004,
+            "lat": 9.5249825,
+            "lon": 44.07982,
+            "tags": {
+                "amenity": "school",
+                "name": "Al-Irshad secondary school"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3645086673,
+            "lat": 9.5372973,
+            "lon": 44.0931513,
+            "tags": {
+                "amenity": "school",
+                "name": "MMooge School"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3731554924,
+            "lat": 9.5599496,
+            "lon": 44.1159755,
+            "tags": {
+                "amenity": "place_of_worship",
+                "building": "mosque",
+                "denomination": "sunni",
+                "name": "Masaajid",
+                "opening_hours": "sunrise-sunset",
+                "religion": "muslim",
+                "service_times": "sunset,sunrise",
+                "wheelchair": "no"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3731615205,
+            "lat": 9.5559773,
+            "lon": 44.0998631,
+            "tags": {
+                "amenity": "place_of_worship",
+                "name": "Qudbiga Sh.Nuur",
+                "religion": "muslim"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4462141636,
+            "lat": 9.5610587,
+            "lon": 44.0633836,
+            "tags": {
+                "amenity": "place_of_worship"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4463299375,
+            "lat": 9.5622395,
+            "lon": 44.0498557,
+            "tags": {
+                "amenity": "school",
+                "name": "Dugsiga Hoose/dhexe ee Sheekh Madar"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4463540846,
+            "lat": 9.5642781,
+            "lon": 44.0390493,
+            "tags": {
+                "amenity": "school",
+                "name": "Dugsiga Hoose/dhexe ee 31 May"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4596847498,
+            "lat": 9.5737831,
+            "lon": 44.0359181,
+            "tags": {
+                "addr:postcode": "+252",
+                "addr:street": "Hero Awr Road",
+                "amenity": "school",
+                "name": "Talasan",
+                "name:ar": "Talasan",
+                "opening_hours": "Sa-Th 08:00-21:00",
+                "operator": "his Mohamed",
+                "phone": "634477677",
+                "website": "https://talasan.net/"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4702315995,
+            "lat": 9.5775211,
+            "lon": 44.0283137,
+            "tags": {
+                "amenity": "school",
+                "name": "admas university"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4804125423,
+            "lat": 9.5431392,
+            "lon": 44.0590749,
+            "tags": {
+                "addr:city": "Hargaysia",
+                "addr:street": "Hugur Street",
+                "amenity": "school",
+                "grades": "1-5",
+                "name": "Bilaal Collage",
+                "name:en": "Bilaal college",
+                "operator": "Bilaal",
+                "operator:type": "private",
+                "religion": "muslim"
+            }
+        },
+        {
+            "type": "node",
+            "id": 5367492021,
+            "lat": 9.5429673,
+            "lon": 44.0659395,
+            "tags": {
+                "amenity": "school",
+                "name": "\u0627\u0644\u0647\u062f\u0649",
+                "name:ar": "\u0627\u0644\u0647\u062f\u0649",
+                "name:en": "Al Huda"
+            }
+        },
+        {
+            "type": "node",
+            "id": 6342541287,
+            "lat": 9.5636947,
+            "lon": 44.1164877,
+            "tags": {
+                "addr:street": "Road Number 1 / \u0637\u0631\u064a\u0642 \u0631\u0642\u0645 1",
+                "amenity": "school",
+                "name": "AGOOMAHA ALMANAAR",
+                "phone": "00252634220248"
+            }
+        },
+        {
+            "type": "node",
+            "id": 7866355584,
+            "lat": 9.5209107,
+            "lon": 44.0664223,
+            "tags": {
+                "amenity": "place_of_worship",
+                "religion": "muslim"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8929222535,
+            "lat": 9.5433585,
+            "lon": 44.0565885,
+            "tags": {
+                "addr:city": "Hargayisa",
+                "addr:housenumber": "2",
+                "addr:street": "masjid rashiid street",
+                "amenity": "school",
+                "denomination": "sunni",
+                "grades": "1-7",
+                "name": "Malcamada Daar Al Hikma",
+                "operator": "Mubarik Muuse",
+                "operator:type": "private",
+                "religion": "muslim"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8929222536,
+            "lat": 9.5491133,
+            "lon": 44.052711,
+            "tags": {
+                "amenity": "school",
+                "name": "Dayib Guray Secondry school"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8929222537,
+            "lat": 9.5505072,
+            "lon": 44.053253,
+            "tags": {
+                "addr:city": "Hargaysia",
+                "addr:housenumber": "7",
+                "addr:street": "Birjeex Street",
+                "amenity": "school",
+                "name": "Alifdoon Preimery School",
+                "operator": "Govermental",
+                "operator:type": "public"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8930352342,
+            "lat": 9.5529089,
+            "lon": 44.0668938,
+            "tags": {
+                "amenity": "school",
+                "name": "Xalane School"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8930352343,
+            "lat": 9.5537929,
+            "lon": 44.0667631,
+            "tags": {
+                "amenity": "school",
+                "name": "Quule Aadan S.School"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8930451117,
+            "lat": 9.5433239,
+            "lon": 44.056364,
+            "tags": {
+                "amenity": "place_of_worship",
+                "name": "Masjid Arashiid",
+                "religion": "muslim"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8930451120,
+            "lat": 9.543445,
+            "lon": 44.0600171,
+            "tags": {
+                "amenity": "place_of_worship",
+                "religion": "muslim"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8930451122,
+            "lat": 9.5391694,
+            "lon": 44.0569266,
+            "tags": {
+                "amenity": "place_of_worship",
+                "name": "Masaajidka Badhka",
+                "religion": "muslim"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8930522170,
+            "lat": 9.5459084,
+            "lon": 44.0565395,
+            "tags": {
+                "amenity": "place_of_worship",
+                "denomination": "sunni",
+                "religion": "muslim",
+                "service_times": "24/7"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8930522171,
+            "lat": 9.5460469,
+            "lon": 44.0565751,
+            "tags": {
+                "amenity": "school"
+            }
+        },
+        {
+            "type": "node",
+            "id": 9182935086,
+            "lat": 9.5686835,
+            "lon": 44.0388452,
+            "tags": {
+                "amenity": "place_of_worship",
+                "religion": "muslim"
+            }
+        },
+        {
+            "type": "node",
+            "id": 11263937169,
+            "lat": 9.5705483,
+            "lon": 44.0088469,
+            "tags": {
+                "addr:street": "Ileys S.School 1",
+                "amenity": "school",
+                "email": "Ileyssecondaryschool@gmail.com",
+                "name:en": "Ileys Secondary School 1",
+                "opening_hours": "Fr-Tu 06:00-12:30",
+                "phone": "0633219470"
+            }
+        },
+        {
+            "type": "way",
+            "id": 412519824,
+            "nodes": [
+                4139289290,
+                1138798681,
+                4139289296,
+                4139564427,
+                4139289299,
+                4139370843,
+                6786104340,
+                4139289302,
+                1409102182,
+                1409102195,
+                1409102208,
+                1409102215,
+                1409102220,
+                1409102235,
+                1409102250,
+                1409102255,
+                1409102254,
+                1409102263,
+                4139289310,
+                4139564433,
+                1409102281,
+                4140974525,
+                1409102285,
+                4139289314,
+                4139289316,
+                4139289317,
+                4139289321,
+                4139289324,
+                5608547897,
+                4139289337,
+                4139564446,
+                1409102644,
+                1409102726,
+                5608465442,
+                5608465443,
+                5608465441,
+                4139289344,
+                4139289341,
+                4139564447,
+                4139495069,
+                4139495068,
+                4139495067,
+                5608838256,
+                4139495066,
+                4139495065,
+                4139289330,
+                4139289329,
+                4139289325,
+                5307484290,
+                4139289319,
+                5608341201,
+                4139289318,
+                5608341953,
+                1409102305,
+                4139289311,
+                4139495058,
+                5608307426,
+                4139289307,
+                5608307428,
+                4139289303,
+                2987727933,
+                5608307427,
+                5608307441,
+                5608307442,
+                4139289308,
+                4139495059,
+                4139289315,
+                5608307443,
+                4139289322,
+                4139289332,
+                4139495070,
+                4139289345,
+                1409102737,
+                5608307444,
+                1409102736,
+                10223084011,
+                4139289348,
+                5608307445,
+                5608307446,
+                4139289343,
+                13819795208,
+                5634009613,
+                5634009946,
+                4139289340,
+                10630997557,
+                4139289338,
+                4139289336,
+                4139289328,
+                4139289327,
+                4139289323,
+                4139289326,
+                1409102527,
+                4139289347,
+                10630997579,
+                4139289362,
+                4139289372,
+                10630997566,
+                4139289373,
+                4139289379,
+                4139289383,
+                4139289385,
+                1409103946,
+                4139289386,
+                4139289381,
+                1409103882,
+                4139289370,
+                5780900374,
+                4139289359,
+                1409102976,
+                4139289353,
+                4139289354,
+                4139289355,
+                7212962829,
+                4139289350,
+                7212962866,
+                1138650345
+            ],
+            "tags": {
+                "access": "yes",
+                "bicycle": "yes",
+                "fixme": "add proper tags: degmada = GL, 26, KB; gobolka = marodijex",
+                "foot": "yes",
+                "highway": "primary",
+                "horse": "yes",
+                "lanes": "2",
+                "maxspeed": "30",
+                "motor_vehicle": "yes",
+                "name": "Road No 2",
+                "oneway": "yes",
+                "surface": "asphalt"
+            }
+        },
+        {
+            "type": "node",
+            "id": 1138650345,
+            "lat": 9.5643605,
+            "lon": 44.0430999
+        },
+        {
+            "type": "node",
+            "id": 1409102976,
+            "lat": 9.5643951,
+            "lon": 44.0445913
+        },
+        {
+            "type": "node",
+            "id": 4139289350,
+            "lat": 9.5643952,
+            "lon": 44.0433813
+        },
+        {
+            "type": "node",
+            "id": 4139289353,
+            "lat": 9.5644484,
+            "lon": 44.0442926
+        },
+        {
+            "type": "node",
+            "id": 4139289354,
+            "lat": 9.5644787,
+            "lon": 44.0438515
+        },
+        {
+            "type": "node",
+            "id": 4139289355,
+            "lat": 9.5644722,
+            "lon": 44.0436442
+        },
+        {
+            "type": "node",
+            "id": 4139289359,
+            "lat": 9.5645389,
+            "lon": 44.0446629
+        },
+        {
+            "type": "node",
+            "id": 4139289370,
+            "lat": 9.5648603,
+            "lon": 44.0448653
+        },
+        {
+            "type": "node",
+            "id": 5780900374,
+            "lat": 9.5646804,
+            "lon": 44.0447433
+        },
+        {
+            "type": "node",
+            "id": 7212962829,
+            "lat": 9.5644232,
+            "lon": 44.0435058
+        },
+        {
+            "type": "node",
+            "id": 7212962866,
+            "lat": 9.5643694,
+            "lon": 44.0432392
+        },
+        {
+            "type": "node",
+            "id": 10630997566,
+            "lat": 9.5649916,
+            "lon": 44.0466718
+        },
+        {
+            "type": "node",
+            "id": 1409102527,
+            "lat": 9.5639082,
+            "lon": 44.047482
+        },
+        {
+            "type": "node",
+            "id": 1409102736,
+            "lat": 9.5642599,
+            "lon": 44.0509835
+        },
+        {
+            "type": "node",
+            "id": 1409102737,
+            "lat": 9.5642612,
+            "lon": 44.051131
+        },
+        {
+            "type": "node",
+            "id": 4139289308,
+            "lat": 9.5627827,
+            "lon": 44.0532124
+        },
+        {
+            "type": "node",
+            "id": 4139289315,
+            "lat": 9.5631939,
+            "lon": 44.0528651
+        },
+        {
+            "type": "node",
+            "id": 4139289322,
+            "lat": 9.5636528,
+            "lon": 44.0523098
+        },
+        {
+            "type": "node",
+            "id": 4139289323,
+            "lat": 9.5636251,
+            "lon": 44.0478587
+        },
+        {
+            "type": "node",
+            "id": 4139289326,
+            "lat": 9.5635708,
+            "lon": 44.0478037
+        },
+        {
+            "type": "node",
+            "id": 4139289327,
+            "lat": 9.56368,
+            "lon": 44.0479137
+        },
+        {
+            "type": "node",
+            "id": 4139289328,
+            "lat": 9.5637488,
+            "lon": 44.0479888
+        },
+        {
+            "type": "node",
+            "id": 4139289332,
+            "lat": 9.5638671,
+            "lon": 44.0519048
+        },
+        {
+            "type": "node",
+            "id": 4139289336,
+            "lat": 9.5639287,
+            "lon": 44.0482369
+        },
+        {
+            "type": "node",
+            "id": 4139289338,
+            "lat": 9.5639921,
+            "lon": 44.0483428
+        },
+        {
+            "type": "node",
+            "id": 4139289340,
+            "lat": 9.5640344,
+            "lon": 44.0486003
+        },
+        {
+            "type": "node",
+            "id": 4139289343,
+            "lat": 9.5641468,
+            "lon": 44.0497644
+        },
+        {
+            "type": "node",
+            "id": 4139289345,
+            "lat": 9.5641554,
+            "lon": 44.0513644
+        },
+        {
+            "type": "node",
+            "id": 4139289347,
+            "lat": 9.5642196,
+            "lon": 44.0472753
+        },
+        {
+            "type": "node",
+            "id": 4139289348,
+            "lat": 9.5642308,
+            "lon": 44.0506603
+        },
+        {
+            "type": "node",
+            "id": 4139289362,
+            "lat": 9.5646183,
+            "lon": 44.0469575
+        },
+        {
+            "type": "node",
+            "id": 4139289372,
+            "lat": 9.5648892,
+            "lon": 44.0467497
+        },
+        {
+            "type": "node",
+            "id": 4139495059,
+            "lat": 9.5630366,
+            "lon": 44.0530005
+        },
+        {
+            "type": "node",
+            "id": 4139495070,
+            "lat": 9.5640192,
+            "lon": 44.051595
+        },
+        {
+            "type": "node",
+            "id": 5608307443,
+            "lat": 9.5635894,
+            "lon": 44.0524198
+        },
+        {
+            "type": "node",
+            "id": 5608307444,
+            "lat": 9.5642691,
+            "lon": 44.0510626
+        },
+        {
+            "type": "node",
+            "id": 5608307445,
+            "lat": 9.5642241,
+            "lon": 44.0504967
+        },
+        {
+            "type": "node",
+            "id": 5608307446,
+            "lat": 9.5641997,
+            "lon": 44.0502432
+        },
+        {
+            "type": "node",
+            "id": 5634009613,
+            "lat": 9.5640906,
+            "lon": 44.0491888
+        },
+        {
+            "type": "node",
+            "id": 5634009946,
+            "lat": 9.5640558,
+            "lon": 44.0488238
+        },
+        {
+            "type": "node",
+            "id": 10223084011,
+            "lat": 9.5642419,
+            "lon": 44.0507836
+        },
+        {
+            "type": "node",
+            "id": 10630997557,
+            "lat": 9.5640158,
+            "lon": 44.0484869
+        },
+        {
+            "type": "node",
+            "id": 10630997579,
+            "lat": 9.5644617,
+            "lon": 44.0470844
+        },
+        {
+            "type": "node",
+            "id": 13819795208,
+            "lat": 9.5641097,
+            "lon": 44.0493886
+        },
+        {
+            "type": "node",
+            "id": 1409103882,
+            "lat": 9.5650507,
+            "lon": 44.045045
+        },
+        {
+            "type": "node",
+            "id": 1409103946,
+            "lat": 9.5653046,
+            "lon": 44.045839
+        },
+        {
+            "type": "node",
+            "id": 4139289373,
+            "lat": 9.5650639,
+            "lon": 44.0465847
+        },
+        {
+            "type": "node",
+            "id": 4139289379,
+            "lat": 9.5651538,
+            "lon": 44.0464398
+        },
+        {
+            "type": "node",
+            "id": 4139289381,
+            "lat": 9.5651876,
+            "lon": 44.0452905
+        },
+        {
+            "type": "node",
+            "id": 4139289383,
+            "lat": 9.5652173,
+            "lon": 44.0462923
+        },
+        {
+            "type": "node",
+            "id": 4139289385,
+            "lat": 9.5652617,
+            "lon": 44.046181
+        },
+        {
+            "type": "node",
+            "id": 4139289386,
+            "lat": 9.5652868,
+            "lon": 44.0456686
+        },
+        {
+            "type": "node",
+            "id": 1409102305,
+            "lat": 9.563149,
+            "lon": 44.0572143
+        },
+        {
+            "type": "node",
+            "id": 2987727933,
+            "lat": 9.562458,
+            "lon": 44.0535852
+        },
+        {
+            "type": "node",
+            "id": 4139289303,
+            "lat": 9.5625069,
+            "lon": 44.0538836
+        },
+        {
+            "type": "node",
+            "id": 4139289307,
+            "lat": 9.5626597,
+            "lon": 44.0546058
+        },
+        {
+            "type": "node",
+            "id": 4139289311,
+            "lat": 9.5629618,
+            "lon": 44.0562587
+        },
+        {
+            "type": "node",
+            "id": 4139289318,
+            "lat": 9.5634267,
+            "lon": 44.0587007
+        },
+        {
+            "type": "node",
+            "id": 4139289319,
+            "lat": 9.5634915,
+            "lon": 44.0590073
+        },
+        {
+            "type": "node",
+            "id": 4139495058,
+            "lat": 9.5629129,
+            "lon": 44.055963
+        },
+        {
+            "type": "node",
+            "id": 5307484290,
+            "lat": 9.5635589,
+            "lon": 44.0593426
+        },
+        {
+            "type": "node",
+            "id": 5608307426,
+            "lat": 9.5627589,
+            "lon": 44.0550725
+        },
+        {
+            "type": "node",
+            "id": 5608307427,
+            "lat": 9.5624745,
+            "lon": 44.0535121
+        },
+        {
+            "type": "node",
+            "id": 5608307428,
+            "lat": 9.5625195,
+            "lon": 44.0539607
+        },
+        {
+            "type": "node",
+            "id": 5608307441,
+            "lat": 9.5625182,
+            "lon": 44.0534303
+        },
+        {
+            "type": "node",
+            "id": 5608307442,
+            "lat": 9.5626107,
+            "lon": 44.0533284
+        },
+        {
+            "type": "node",
+            "id": 5608341201,
+            "lat": 9.5634655,
+            "lon": 44.0588698
+        },
+        {
+            "type": "node",
+            "id": 5608341953,
+            "lat": 9.5631677,
+            "lon": 44.0573146
+        },
+        {
+            "type": "node",
+            "id": 1409102644,
+            "lat": 9.5640898,
+            "lon": 44.0633649
+        },
+        {
+            "type": "node",
+            "id": 1409102726,
+            "lat": 9.5641607,
+            "lon": 44.0632345
+        },
+        {
+            "type": "node",
+            "id": 4139289316,
+            "lat": 9.5633441,
+            "lon": 44.0661849
+        },
+        {
+            "type": "node",
+            "id": 4139289317,
+            "lat": 9.5633785,
+            "lon": 44.0658791
+        },
+        {
+            "type": "node",
+            "id": 4139289321,
+            "lat": 9.5634816,
+            "lon": 44.0655358
+        },
+        {
+            "type": "node",
+            "id": 4139289324,
+            "lat": 9.5636423,
+            "lon": 44.0648384
+        },
+        {
+            "type": "node",
+            "id": 4139289325,
+            "lat": 9.5637044,
+            "lon": 44.0599649
+        },
+        {
+            "type": "node",
+            "id": 4139289329,
+            "lat": 9.5637759,
+            "lon": 44.0604705
+        },
+        {
+            "type": "node",
+            "id": 4139289330,
+            "lat": 9.5638207,
+            "lon": 44.0606996
+        },
+        {
+            "type": "node",
+            "id": 4139289337,
+            "lat": 9.5639128,
+            "lon": 44.0638299
+        },
+        {
+            "type": "node",
+            "id": 4139289341,
+            "lat": 9.564046,
+            "lon": 44.0622477
+        },
+        {
+            "type": "node",
+            "id": 4139289344,
+            "lat": 9.5640821,
+            "lon": 44.0624512
+        },
+        {
+            "type": "node",
+            "id": 4139495065,
+            "lat": 9.5638378,
+            "lon": 44.0608302
+        },
+        {
+            "type": "node",
+            "id": 4139495066,
+            "lat": 9.5638772,
+            "lon": 44.0612388
+        },
+        {
+            "type": "node",
+            "id": 4139495067,
+            "lat": 9.5639246,
+            "lon": 44.0614825
+        },
+        {
+            "type": "node",
+            "id": 4139495068,
+            "lat": 9.5639602,
+            "lon": 44.0617156
+        },
+        {
+            "type": "node",
+            "id": 4139495069,
+            "lat": 9.5640004,
+            "lon": 44.0619716
+        },
+        {
+            "type": "node",
+            "id": 4139564446,
+            "lat": 9.5639464,
+            "lon": 44.0637656
+        },
+        {
+            "type": "node",
+            "id": 4139564447,
+            "lat": 9.5640459,
+            "lon": 44.0622005
+        },
+        {
+            "type": "node",
+            "id": 5608465441,
+            "lat": 9.5641596,
+            "lon": 44.0629298
+        },
+        {
+            "type": "node",
+            "id": 5608465442,
+            "lat": 9.5641726,
+            "lon": 44.0630279
+        },
+        {
+            "type": "node",
+            "id": 5608465443,
+            "lat": 9.5641646,
+            "lon": 44.0629609
+        },
+        {
+            "type": "node",
+            "id": 5608547897,
+            "lat": 9.5638251,
+            "lon": 44.0641093
+        },
+        {
+            "type": "node",
+            "id": 5608838256,
+            "lat": 9.5639194,
+            "lon": 44.06145
+        },
+        {
+            "type": "node",
+            "id": 1409102182,
+            "lat": 9.5624983,
+            "lon": 44.0724144
+        },
+        {
+            "type": "node",
+            "id": 1409102195,
+            "lat": 9.5625608,
+            "lon": 44.072121
+        },
+        {
+            "type": "node",
+            "id": 1409102208,
+            "lat": 9.5625895,
+            "lon": 44.0719243
+        },
+        {
+            "type": "node",
+            "id": 1409102215,
+            "lat": 9.562613,
+            "lon": 44.071656
+        },
+        {
+            "type": "node",
+            "id": 1409102220,
+            "lat": 9.5626362,
+            "lon": 44.0714389
+        },
+        {
+            "type": "node",
+            "id": 1409102235,
+            "lat": 9.5627365,
+            "lon": 44.0707176
+        },
+        {
+            "type": "node",
+            "id": 1409102250,
+            "lat": 9.5628207,
+            "lon": 44.070101
+        },
+        {
+            "type": "node",
+            "id": 1409102254,
+            "lat": 9.5628605,
+            "lon": 44.0698076
+        },
+        {
+            "type": "node",
+            "id": 1409102255,
+            "lat": 9.5628276,
+            "lon": 44.0700391
+        },
+        {
+            "type": "node",
+            "id": 1409102263,
+            "lat": 9.5628933,
+            "lon": 44.0694855
+        },
+        {
+            "type": "node",
+            "id": 1409102281,
+            "lat": 9.5630275,
+            "lon": 44.0682568
+        },
+        {
+            "type": "node",
+            "id": 1409102285,
+            "lat": 9.563091,
+            "lon": 44.0677405
+        },
+        {
+            "type": "node",
+            "id": 4139289302,
+            "lat": 9.5624627,
+            "lon": 44.0727274
+        },
+        {
+            "type": "node",
+            "id": 4139289310,
+            "lat": 9.5629292,
+            "lon": 44.0691587
+        },
+        {
+            "type": "node",
+            "id": 4139289314,
+            "lat": 9.5631989,
+            "lon": 44.0669842
+        },
+        {
+            "type": "node",
+            "id": 4139370843,
+            "lat": 9.5624939,
+            "lon": 44.0729575
+        },
+        {
+            "type": "node",
+            "id": 4139564433,
+            "lat": 9.5629572,
+            "lon": 44.0689319
+        },
+        {
+            "type": "node",
+            "id": 4140974525,
+            "lat": 9.5630676,
+            "lon": 44.0679344
+        },
+        {
+            "type": "node",
+            "id": 6786104340,
+            "lat": 9.5624599,
+            "lon": 44.0728489
+        },
+        {
+            "type": "node",
+            "id": 1138798681,
+            "lat": 9.561115,
+            "lon": 44.0733091
+        },
+        {
+            "type": "node",
+            "id": 4139289290,
+            "lat": 9.5608611,
+            "lon": 44.0733558
+        },
+        {
+            "type": "node",
+            "id": 4139289296,
+            "lat": 9.5616223,
+            "lon": 44.0731747
+        },
+        {
+            "type": "node",
+            "id": 4139289299,
+            "lat": 9.5620613,
+            "lon": 44.0730728
+        },
+        {
+            "type": "node",
+            "id": 4139564427,
+            "lat": 9.5618646,
+            "lon": 44.0731162
+        }
+    ]
+}

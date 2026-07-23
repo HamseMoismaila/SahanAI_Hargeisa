@@ -108,8 +108,13 @@ const GATED_COMMUNITIES = [
 
 // Click Handler to capture selections (or add points for measurement)
 function MapClickHandler({ onClick, isMeasuring, onAddMeasurePoint }) {
+  const map = useMap();
   useMapEvents({
     click(e) {
+      if (map.pm && map.pm.globalDrawModeEnabled()) {
+        // Ignore clicks if the user is currently drawing a shape
+        return;
+      }
       if (isMeasuring) {
         onAddMeasurePoint(e.latlng);
       } else {
@@ -212,7 +217,9 @@ function MapSearchFlyer({ selectedLocation }) {
   const map = useMap();
   useEffect(() => {
     if (selectedLocation) {
-      map.flyTo([selectedLocation.lat, selectedLocation.lng], 16, { duration: 1.5 });
+      const currentZoom = map.getZoom();
+      const targetZoom = currentZoom > 16 ? currentZoom : 16;
+      map.flyTo([selectedLocation.lat, selectedLocation.lng], targetZoom, { duration: 1.5 });
     }
   }, [selectedLocation, map]);
   return null;
@@ -586,7 +593,15 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
           </Marker>
         )}
 
-        {hotspots && hotspots.features.map((feature, idx) => (
+        {hotspots && hotspots.features.filter(feature => {
+          if (!selectedLocation) return false;
+          // Only show hotspot circle if it is the currently selected location
+          const dist = Math.sqrt(
+            Math.pow(selectedLocation.lat - feature.geometry.coordinates[1], 2) +
+            Math.pow(selectedLocation.lng - feature.geometry.coordinates[0], 2)
+          );
+          return dist < 0.001; // matches coordinates within ~110 meters
+        }).map((feature, idx) => (
           <Circle 
             key={idx}
             center={[feature.geometry.coordinates[1], feature.geometry.coordinates[0]]}
