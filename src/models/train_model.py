@@ -75,7 +75,12 @@ class GrowthPredictor:
         # Hargeisa Landmarks
         city_center = (9.5600, 44.0650)
         university = (9.5400, 44.0200)
-        main_road = (9.5620, 44.0600)   # Hargeisa highway corridor
+        # Hargeisa Municipal District road network nodes (Bypass, 150 Road, and Taiwan Airport Ave)
+        road_segments = [
+            (9.5650, 44.1350), (9.5450, 44.1150), (9.5250, 44.0900), (9.5080, 44.0500), (9.5120, 43.9900), (9.5450, 43.9500),
+            (9.5850, 44.0150), (9.5880, 44.0350), (9.5810, 44.0550), (9.5780, 44.0900), (9.5550, 44.1100), (9.5510, 44.1150),
+            (9.5550, 44.0650), (9.5400, 44.0550), (9.5200, 44.0720), (9.5620, 44.0600)
+        ]
         schools = (9.5500, 44.0400)     # Primary school cluster area
         masjid = (9.5580, 44.0550)      # Neighborhood masjid cluster
         # Hargeisa actual winding dry riverbed (Laga) path nodes
@@ -97,7 +102,7 @@ class GrowthPredictor:
         
         dist_to_center = calc_dist((lat, lon), city_center)
         dist_to_uni = calc_dist((lat, lon), university)
-        dist_to_road = calc_dist((lat, lon), main_road)
+        dist_to_road = min(calc_dist((lat, lon), node) for node in road_segments)
         dist_to_school = calc_dist((lat, lon), schools)
         dist_to_masjid = calc_dist((lat, lon), masjid)
         dist_to_laga = min(calc_dist((lat, lon), node) for node in laga_path)

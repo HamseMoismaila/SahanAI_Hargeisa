@@ -81,14 +81,16 @@ const SOIL_ZONES = [
   }
 ];
 
-// Newly graded and asphalted roads in the last 4 years (Mooge Administration Roads)
+// Newly graded and asphalted roads in the last 4 years (Mooge Administration District Projects)
 const NEW_ROADS = [
-  // Hargeisa Bypass highway (completed corridor in south-east bypass)
-  [[9.5200, 44.0200], [9.5220, 44.0500], [9.5300, 44.0800], [9.5420, 44.1100], [9.5520, 44.1400]],
-  // 150 Road expansion (North-east connecting ring road)
-  [[9.5850, 44.0150], [9.5820, 44.0450], [9.5810, 44.0750], [9.5780, 44.1050]],
-  // Jigjiga Yar new commercial inner tarmac road links
-  [[9.5700, 44.0300], [9.5780, 44.0320], [9.5840, 44.0350]]
+  // 1. The 22.5km Hargeisa Bypass Road (Outer Southern Truck loop diverting port traffic)
+  [[9.5650, 44.1350], [9.5450, 44.1150], [9.5250, 44.0900], [9.5080, 44.0500], [9.5120, 43.9900], [9.5450, 43.9500]],
+  
+  // 2. The 13km 150 Ring Road (Major northern transit loop linking Koodbuur, Jigjiga Yar, and east)
+  [[9.5850, 44.0150], [9.5880, 44.0350], [9.5810, 44.0550], [9.5780, 44.0900], [9.5550, 44.1100], [9.5510, 44.1150]],
+  
+  // 3. Taiwan Avenue (Airport Connector Link from Central Road No. 1 to Egal Airport Terminal)
+  [[9.5550, 44.0650], [9.5400, 44.0550], [9.5200, 44.0720]]
 ];
 
 // Search Component with Google Maps geocoding integration
