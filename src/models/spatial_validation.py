@@ -52,8 +52,17 @@ def perform_spatial_validation():
     city_center = (9.5600, 44.0650)
     university = (9.5400, 44.0200)
     laga_center = (9.5560, 44.0500)
+    airport = (9.5180, 44.0890)
     
-    # 1. Feature Engineering
+    sub_cities = [
+        {"name": "Ibrahim Koodbuur District", "coords": (9.585, 44.050), "tax": 0.25},
+        {"name": "26 June District", "coords": (9.565, 44.065), "tax": 0.25},
+        {"name": "31 May District", "coords": (9.555, 44.085), "tax": 0.15},
+        {"name": "Ga'an Libaax District", "coords": (9.560, 44.100), "tax": 0.15},
+        {"name": "Mohamoud Haybe District", "coords": (9.535, 44.060), "tax": 0.10},
+        {"name": "Ahmed Dhagah District", "coords": (9.540, 44.030), "tax": 0.10}
+    ]
+    
     records = []
     for _, row in df_listings.iterrows():
         pt = (row['lat'], row['lon'])
@@ -63,7 +72,12 @@ def perform_spatial_validation():
         dist_to_school = min([calc_dist(pt, s) for s in schools]) if schools else 1500
         dist_to_masjid = min([calc_dist(pt, m) for m in masjids]) if masjids else 800
         dist_to_laga = calc_dist(pt, laga_center)
+        dist_to_airport = calc_dist(pt, airport)
         
+        closest_sc = min(sub_cities, key=lambda sc: calc_dist(pt, sc["coords"]))
+        tax_rate = closest_sc["tax"]
+        
+        pop_density = round(100 * np.exp(-dist_to_center / 2500) + 50 * np.exp(-dist_to_uni / 1800), 1)
         ndbi_change = 0.15 * np.exp(-dist_to_center / 3000)
         
         records.append({
@@ -75,6 +89,9 @@ def perform_spatial_validation():
             'dist_to_center': dist_to_center,
             'dist_to_university': dist_to_uni,
             'dist_to_laga': dist_to_laga,
+            'dist_to_airport': dist_to_airport,
+            'tax_rate': tax_rate,
+            'population_density': pop_density,
             'market_price_sqm': row['market_price_sqm']
         })
         
@@ -86,18 +103,15 @@ def perform_spatial_validation():
         'dist_to_highway', 
         'dist_to_center', 
         'dist_to_university',
-        'dist_to_laga'
+        'dist_to_laga',
+        'dist_to_airport',
+        'tax_rate',
+        'population_density'
     ]
     
-    # 2. Spatial Split: Hargeisa is geographically divided North-South by the dry riverbed (Laga/Dooxa)
-    # The riverbed lat is around 9.554 - 9.556
     split_lat = 9.554
-    
     train_df = df[df['lat'] >= split_lat]  # North Hargeisa
     test_df = df[df['lat'] < split_lat]   # South Hargeisa
-    
-    print(f"Total listings available: {len(df)}")
-    print(f"Staging Spatial Split: {len(train_df)} plots in North Hargeisa, {len(test_df)} plots in South Hargeisa.\n")
     
     X_train = train_df[features]
     y_train = train_df['market_price_sqm']
@@ -105,29 +119,26 @@ def perform_spatial_validation():
     X_test = test_df[features]
     y_test = test_df['market_price_sqm']
     
-    # 3. Train Model on North Hargeisa
     model = xgb.XGBRegressor(
         objective='reg:squarederror',
-        n_estimators=100,
+        n_estimators=120,
         learning_rate=0.08,
         max_depth=4,
         random_state=42
     )
     
-    print("Training XGBoost on NORTH HARGEISA vacant land data only...")
+    print("Training XGBoost on NORTH HARGEISA vacant land with regional/demographic features...")
     model.fit(X_train, y_train)
     
-    # 4. Predict on SOUTH HARGEISA (unseen geographical region)
     preds = model.predict(X_test)
     rmse = mean_squared_error(y_test, preds) ** 0.5
     r2 = r2_score(y_test, preds)
     
-    print("\n--- SPATIAL CROSS-VALIDATION REPORT ---")
+    print("\n--- SPATIAL CROSS-VALIDATION REPORT (REGIONAL FEATURES ENABLED) ---")
     print("Train Region: NORTH HARGEISA | Test Region: SOUTH HARGEISA")
     print(f"Testing RMSE on South Hargeisa: ${rmse:.2f}/sqm")
     print(f"Testing R2 Score on South Hargeisa: {r2:.6f}")
     
-    # Analyze predictions
     test_results = pd.DataFrame({
         'Actual': y_test,
         'Predicted': preds,

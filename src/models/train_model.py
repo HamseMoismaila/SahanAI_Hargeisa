@@ -14,16 +14,20 @@ class GrowthPredictor:
         self.growth_model_path = growth_model_path
         self.price_model_path = price_model_path
         
+        # Features used by the trained XGBoost model
         self.features = [
             'ndbi_change', 
             'dist_to_road', 
             'dist_to_highway', 
             'dist_to_center', 
             'dist_to_university',
-            'dist_to_laga'
+            'dist_to_laga',
+            'dist_to_airport',
+            'tax_rate',
+            'population_density'
         ]
         
-        # Load models if they exist
+        # Load models
         self.growth_model = self.load_model(self.growth_model_path)
         self.price_model = self.load_model(self.price_model_path)
 
@@ -41,8 +45,9 @@ class GrowthPredictor:
         """Calculates distance features to real Hargeisa landmark anchors."""
         city_center = (9.5600, 44.0650)
         university = (9.5400, 44.0200)
+        airport = (9.5180, 44.0890)
         
-        # Extract road and river coordinates from raw OSM data if available
+        # Extract road coordinates from raw OSM data
         osm_path = "data/raw/hargeisa_osm_data.json"
         roads = []
         laga_path = [
@@ -55,8 +60,6 @@ class GrowthPredictor:
                 with open(osm_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                 elements = data.get("elements", [])
-                
-                # Resolve way nodes coordinates
                 node_coords = {el["id"]: (el["lat"], el["lon"]) for el in elements if el.get("type") == "node" and "lat" in el}
                 for el in elements:
                     if el.get("type") == "way" and "highway" in el.get("tags", {}):
@@ -73,6 +76,22 @@ class GrowthPredictor:
         dist_to_uni = calc_dist((lat, lon), university)
         dist_to_road = min(calc_dist((lat, lon), r) for r in roads) if roads else 400.0
         dist_to_laga = min(calc_dist((lat, lon), node) for node in laga_path)
+        dist_to_airport = calc_dist((lat, lon), airport)
+        
+        # Sub-city tax rate lookup
+        sub_cities = [
+            {"name": "Ibrahim Koodbuur District", "coords": (9.585, 44.050), "tax": 0.25},
+            {"name": "26 June District", "coords": (9.565, 44.065), "tax": 0.25},
+            {"name": "31 May District", "coords": (9.555, 44.085), "tax": 0.15},
+            {"name": "Ga'an Libaax District", "coords": (9.560, 44.100), "tax": 0.15},
+            {"name": "Mohamoud Haybe District", "coords": (9.535, 44.060), "tax": 0.10},
+            {"name": "Ahmed Dhagah District", "coords": (9.540, 44.030), "tax": 0.10}
+        ]
+        closest_sc = min(sub_cities, key=lambda sc: calc_dist((lat, lon), sc["coords"]))
+        tax_rate = closest_sc["tax"]
+        
+        # Estimated population density
+        pop_density = round(100 * np.exp(-dist_to_center / 2500) + 50 * np.exp(-dist_to_uni / 1800), 1)
         
         return {
             'ndbi_change': max(0.0, 0.15 * np.exp(-dist_to_center / 3000)),
@@ -80,34 +99,33 @@ class GrowthPredictor:
             'dist_to_highway': dist_to_road * 1.5,
             'dist_to_center': dist_to_center,
             'dist_to_university': dist_to_uni,
-            'dist_to_laga': dist_to_laga
+            'dist_to_laga': dist_to_laga,
+            'dist_to_airport': dist_to_airport,
+            'tax_rate': tax_rate,
+            'population_density': pop_density
         }
 
     def predict_point(self, lat: float, lon: float) -> dict:
-        """
-        Predicts land value and appreciation rate at a coordinate.
-        Combines live XGBoost ML predictions with municipal zoning information.
-        """
         feats = self.calc_distances(lat, lon)
         df_feats = pd.DataFrame([feats])
         
-        # Calculate live price using trained XGBoost Model
+        # Calculate price using trained XGBoost Model (with regional features)
         if self.price_model:
+            # Reorder features list to match training dataframe columns
             predicted_price = float(self.price_model.predict(df_feats[self.features])[0])
         else:
-            # Fallback equation if model is not loaded
             base_price = 250 * np.exp(-feats['dist_to_center'] / 3000)
             penalty = 0.7 + 0.3 * (feats['dist_to_laga'] / 500) if feats['dist_to_laga'] < 500 else 1.0
             predicted_price = base_price * penalty
             
-        # Calculate live appreciation rate using trained XGBoost Model
+        # Calculate appreciation rate
         if self.growth_model:
-            predicted_growth = float(self.growth_model.predict(df_feats[self.features])[0])
+            # We don't train growth on regional features yet, we use the original features list
+            growth_features = ['ndbi_change', 'dist_to_road', 'dist_to_highway', 'dist_to_center', 'dist_to_university', 'dist_to_laga']
+            predicted_growth = float(self.growth_model.predict(df_feats[growth_features])[0])
         else:
-            # Fallback growth rate
-            predicted_growth = 0.05 + 0.10 * np.exp(-feats['dist_to_uni'] / 2000)
+            predicted_growth = 0.05 + 0.10 * np.exp(-feats['dist_to_university'] / 2000)
             
-        # Keep pricing and growth rates bounded realistically
         current_price = max(10.0, predicted_price)
         appreciation = max(0.01, predicted_growth)
         next_year_price = current_price * (1 + appreciation)
