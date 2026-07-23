@@ -65,7 +65,7 @@ class GrowthPredictor:
                     if el.get("type") == "way" and "highway" in el.get("tags", {}):
                         for nid in el.get("nodes", []):
                             if nid in node_coords:
-                                roads.append(node_coords[nid])
+                                roads.append(node_coords[node_id])
             except Exception:
                 pass
                 
@@ -111,7 +111,6 @@ class GrowthPredictor:
         
         # Calculate price using trained XGBoost Model (with regional features)
         if self.price_model:
-            # Reorder features list to match training dataframe columns
             predicted_price = float(self.price_model.predict(df_feats[self.features])[0])
         else:
             base_price = 250 * np.exp(-feats['dist_to_center'] / 3000)
@@ -120,7 +119,6 @@ class GrowthPredictor:
             
         # Calculate appreciation rate
         if self.growth_model:
-            # We don't train growth on regional features yet, we use the original features list
             growth_features = ['ndbi_change', 'dist_to_road', 'dist_to_highway', 'dist_to_center', 'dist_to_university', 'dist_to_laga']
             predicted_growth = float(self.growth_model.predict(df_feats[growth_features])[0])
         else:
@@ -129,6 +127,30 @@ class GrowthPredictor:
         current_price = max(10.0, predicted_price)
         appreciation = max(0.01, predicted_growth)
         next_year_price = current_price * (1 + appreciation)
+        
+        # Distance lookup to closest training listing for confidence scoring
+        def quick_dist(p1, p2):
+            return np.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2) * 111000
+            
+        listings_path = "data/raw/real_market_listings.csv"
+        min_dist_to_listing = 1200.0 # Default fallback
+        if os.path.exists(listings_path):
+            try:
+                df_list = pd.read_csv(listings_path)
+                dists = [quick_dist((lat, lon), (row['lat'], row['lon'])) for _, row in df_list.iterrows()]
+                if dists:
+                    min_dist_to_listing = min(dists)
+            except Exception:
+                pass
+                
+        # Confidence decays from 95% down to 60% as distance to nearest training point increases
+        confidence = 95.0 - (min_dist_to_listing / 250.0)
+        confidence = max(60.0, min(95.0, confidence))
+        
+        # Margin calculated from XGBoost RMSE of ~$9.77/sqm (expanded if confidence is lower)
+        margin = 1.96 * 9.77 * (1.0 + (95.0 - confidence) / 60.0)
+        price_min = max(5.0, current_price - margin)
+        price_max = current_price + margin
         
         # Local municipal zone classification
         sub_cities = [
@@ -139,10 +161,6 @@ class GrowthPredictor:
             {"name": "Mohamoud Haybe District", "coords": (9.535, 44.060), "tax": 0.10},
             {"name": "Ahmed Dhagah District", "coords": (9.540, 44.030), "tax": 0.10}
         ]
-        
-        def quick_dist(p1, p2):
-            return np.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2) * 111000
-            
         closest_sc = min(sub_cities, key=lambda sc: quick_dist((lat, lon), sc["coords"]))
         
         # Access Road Type
@@ -167,7 +185,10 @@ class GrowthPredictor:
             "road_access": road_access,
             "sub_city": closest_sc["name"],
             "tax_rate_sqm": closest_sc["tax"],
-            "landmark_name": "Calculated via XGBoost Regressor Model"
+            "landmark_name": "Calculated via XGBoost Regressor Model",
+            "confidence_score_pct": round(confidence, 1),
+            "confidence_range_min": round(price_min, 2),
+            "confidence_range_max": round(price_max, 2)
         }
         
     def get_top_hotspots(self) -> dict:

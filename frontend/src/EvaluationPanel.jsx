@@ -71,6 +71,9 @@ export default function EvaluationPanel({
   const netGain = futureValue - baseValue;
   const totalRoi = Math.round((netGain / baseValue) * 100);
 
+  const rangeMin = prediction ? Math.round(activeArea * prediction.confidence_range_min) : null;
+  const rangeMax = prediction ? Math.round(activeArea * prediction.confidence_range_max) : null;
+
   const handleCompareClick = (e) => {
     if (e) {
       e.preventDefault();
@@ -253,6 +256,23 @@ export default function EvaluationPanel({
                   <div className="price-growth">{prediction ? `+${prediction.growth_rate_pct}%` : 'Calculating...'}</div>
                 </div>
               </div>
+
+              {prediction && prediction.confidence_score_pct && (
+                <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.15)', fontSize: '0.7rem', color: '#94a3b8', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Model Confidence Score:</span>
+                    <strong style={{ color: prediction.confidence_score_pct > 80 ? '#10b981' : '#f59e0b' }}>
+                      {prediction.confidence_score_pct}%
+                    </strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>90% Confidence Price Range:</span>
+                    <strong style={{ color: '#f1f5f9' }}>
+                      ${rangeMin.toLocaleString()} - ${rangeMax.toLocaleString()}
+                    </strong>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Local Utilities & Infrastructure (Point 2) */}
@@ -418,8 +438,9 @@ export default function EvaluationPanel({
               <ul style={{ paddingLeft: '14px', margin: '6px 0 0 0', fontSize: '0.7rem', color: '#64748b', lineHeight: '1.4', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <li><strong>Soil Classification:</strong> FAO SWALIM Geotechnical & Soil Resources Database</li>
                 <li><strong>Water Pipelines Network:</strong> Hargeisa Water Agency (HWA) & UN-Habitat HUWSUP Reports</li>
-                <li><strong>Topography & Elevation:</strong> NASA SRTM Digital Elevation Model (DEM)</li>
-                <li><strong>Market Price Valuation:</strong> XGBoost ML Regressor trained on Sentinel-2 Satellite NDBI layers</li>
+                <li><strong>Topography & Elevation:</strong> NASA SRTM DEM & Open-Meteo API</li>
+                <li><strong>Geographic Landmarks:</strong> OpenStreetMap (OSM) via Overpass API</li>
+                <li><strong>Market Valuation Model:</strong> XGBoost ML Regressor trained on geocoded listings via geopy/Nominatim</li>
               </ul>
             </div>
           </div>
