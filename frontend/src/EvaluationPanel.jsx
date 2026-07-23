@@ -381,6 +381,17 @@ export default function EvaluationPanel({
                 </div>
               </div>
             </div>
+
+            {/* Data Citing Sources Card */}
+            <div className="analytics-card sources-card" style={{ borderTop: '1px solid #1f2937', marginTop: '16px', paddingTop: '12px', background: 'transparent', boxShadow: 'none' }}>
+              <div className="card-label" style={{ fontSize: '0.65rem', color: '#94a3b8', letterSpacing: '0.05em' }}>DATA SOURCES & METHODOLOGY</div>
+              <ul style={{ paddingLeft: '14px', margin: '6px 0 0 0', fontSize: '0.7rem', color: '#64748b', lineHeight: '1.4', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <li><strong>Soil Classification:</strong> FAO SWALIM Geotechnical & Soil Resources Database</li>
+                <li><strong>Water Pipelines Network:</strong> Hargeisa Water Agency (HWA) & UN-Habitat HUWSUP Reports</li>
+                <li><strong>Topography & Elevation:</strong> NASA SRTM Digital Elevation Model (DEM)</li>
+                <li><strong>Market Price Valuation:</strong> XGBoost ML Regressor trained on Sentinel-2 Satellite NDBI layers</li>
+              </ul>
+            </div>
           </div>
         </>
       )}
