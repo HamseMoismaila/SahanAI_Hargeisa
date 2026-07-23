@@ -95,7 +95,11 @@ export default function EvaluationPanel({
       foundationSurcharge: prediction ? prediction.foundation_surcharge_pct : 0,
       excavationSoil: prediction ? prediction.excavation_soil : 'Clay & Silt Mix',
       diasporaPremium: prediction ? prediction.diaspora_premium_pct : 0.0,
-      diasporaCommunity: prediction ? prediction.diaspora_community_name : 'None'
+      diasporaCommunity: prediction ? prediction.diaspora_community_name : 'None',
+      subCity: prediction ? prediction.sub_city : 'Calculating...',
+      taxRate: prediction ? prediction.tax_rate_sqm : 0.1,
+      landmarkName: prediction ? prediction.landmark_name : 'Calculating...',
+      landmarkDist: prediction ? prediction.landmark_dist_m : 0
     });
   };
 
@@ -157,6 +161,9 @@ export default function EvaluationPanel({
                 <div className="comp-metric">Soil: <strong>{item.excavationSoil}</strong></div>
                 <div className="comp-metric">Surcharge: <strong className={item.foundationSurcharge > 0 ? "text-danger" : ""}>+{item.foundationSurcharge}%</strong></div>
                 <div className="comp-metric">Diaspora Premium: <strong style={{ color: item.diasporaPremium > 0 ? '#10b981' : '#94a3b8' }}>{item.diasporaPremium > 0 ? `+${item.diasporaPremium}%` : 'None'}</strong></div>
+                <div className="comp-metric">Sub-City: <strong>{item.subCity.replace(" District", "")}</strong></div>
+                <div className="comp-metric">Est. Tax: <strong>${Math.round(item.area * item.taxRate).toLocaleString()}/yr</strong></div>
+                <div className="comp-metric">Landmark: <strong>{item.landmarkName.split(" (")[0]}</strong></div>
               </div>
             ))}
             
@@ -268,6 +275,14 @@ export default function EvaluationPanel({
                       : 'None'}
                   </strong>
                 </li>
+                <li>
+                  <span>Sub-City District</span>
+                  <strong>{prediction ? `${prediction.sub_city}` : 'Calculating...'}</strong>
+                </li>
+                <li>
+                  <span>Annual Municipal Land Tax</span>
+                  <strong>{prediction ? `$${Math.round(activeArea * prediction.tax_rate_sqm).toLocaleString()} / yr` : 'Calculating...'}</strong>
+                </li>
               </ul>
             </div>
 
@@ -301,6 +316,10 @@ export default function EvaluationPanel({
             <div className="analytics-card">
               <div className="card-label">Spatial Proximity Landmarks</div>
               <ul className="proximity-list">
+                <li>
+                  <span>Nearest Landmark Anchor</span>
+                  <strong style={{ color: '#8b5cf6' }}>{prediction ? `${prediction.landmark_name} (${(prediction.landmark_dist_m / 1000).toFixed(2)} km)` : 'Calculating...'}</strong>
+                </li>
                 <li>
                   <span>Distance to Sha'ab (Center)</span>
                   <strong>{(getProximityData(selection.lat, selection.lng).distToCenter / 1000).toFixed(2)} km</strong>

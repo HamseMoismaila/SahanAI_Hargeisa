@@ -11,7 +11,8 @@ import {
   LayersControl,
   FeatureGroup,
   Polyline,
-  Polygon
+  Polygon,
+  Tooltip
 } from 'react-leaflet';
 import { GeoSearchControl, OpenStreetMapProvider, GoogleProvider } from 'leaflet-geosearch';
 import { area } from '@turf/area';
@@ -447,6 +448,9 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
                       <p style={{ margin: '4px 0', fontSize: '0.85em', color: '#7c3aed' }}><strong>Diaspora Buffer Premium Zone</strong> (up to +35% impact)</p>
                     </div>
                   </Popup>
+                  <Tooltip permanent direction="top" opacity={0.9}>
+                    <strong style={{ color: '#5b21b6' }}>{gc.name.split(" ")[0]}</strong>
+                  </Tooltip>
                 </Circle>
               ))}
             </FeatureGroup>

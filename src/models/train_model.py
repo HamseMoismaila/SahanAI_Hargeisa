@@ -193,6 +193,28 @@ class GrowthPredictor:
         else:
             excavation_soil = "Clay & Silt Mix"
 
+        # --- Local Sub-City Municipal Zones & Taxes ---
+        sub_cities = [
+            {"name": "Ibrahim Koodbuur District", "coords": (9.585, 44.050), "tax": 0.25},
+            {"name": "26 June District", "coords": (9.565, 44.065), "tax": 0.25},
+            {"name": "31 May District", "coords": (9.555, 44.085), "tax": 0.15},
+            {"name": "Ga'an Libaax District", "coords": (9.560, 44.100), "tax": 0.15},
+            {"name": "Mohamoud Haybe District", "coords": (9.535, 44.060), "tax": 0.10},
+            {"name": "Ahmed Dhagah District", "coords": (9.540, 44.030), "tax": 0.10}
+        ]
+        closest_sc = min(sub_cities, key=lambda sc: calc_dist((lat, lon), sc["coords"]))
+        
+        # --- Local Landmark Anchors (Taallada/Xafad Markers) ---
+        landmarks = [
+            {"name": "Egal Airport Gate", "coords": (9.518, 44.089)},
+            {"name": "MiG Jet Monument (Taallada)", "coords": (9.561, 44.060)},
+            {"name": "Presidential Palace (Madaxtooyada)", "coords": (9.567, 44.067)},
+            {"name": "Hargeisa Club Hotel", "coords": (9.561, 44.069)},
+            {"name": "Tog Wajaale Bypass Junction", "coords": (9.545, 43.950)}
+        ]
+        closest_lm = min(landmarks, key=lambda lm: calc_dist((lat, lon), lm["coords"]))
+        lm_dist = calc_dist((lat, lon), closest_lm["coords"])
+
         return {
             "current_price_sqm": round(current_price, 2),
             "next_year_price_sqm": round(next_year_price, 2),
@@ -203,7 +225,11 @@ class GrowthPredictor:
             "foundation_surcharge_pct": foundation_surcharge,
             "excavation_soil": excavation_soil,
             "diaspora_premium_pct": diaspora_premium_pct,
-            "diaspora_community_name": diaspora_community_name
+            "diaspora_community_name": diaspora_community_name,
+            "sub_city": closest_sc["name"],
+            "tax_rate_sqm": closest_sc["tax"],
+            "landmark_name": closest_lm["name"],
+            "landmark_dist_m": round(lm_dist, 0)
         }
         
     def get_top_hotspots(self) -> dict:
