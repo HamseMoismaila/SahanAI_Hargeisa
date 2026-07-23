@@ -46,7 +46,7 @@ const HWA_PIPELINES = [
 // Laga river channels (Hydro-vulnerability zones)
 const LAGA_CHANNELS = [
   // Main dry riverbed channel winding through Hargeisa center dividing the city north/south
-  [[9.5450, 43.9900], [9.5480, 44.0200], [9.5520, 44.0400], [9.5550, 44.0550], [9.5600, 44.0680], [9.5650, 44.0850], [9.5680, 44.1000], [9.5780, 44.1300]]
+  [[9.5520, 44.0000], [9.5540, 44.0250], [9.5560, 44.0500], [9.5620, 44.0670], [9.5650, 44.0850], [9.5720, 44.1100], [9.5780, 44.1400]]
 ];
 
 // Search Component with Google Maps geocoding integration
