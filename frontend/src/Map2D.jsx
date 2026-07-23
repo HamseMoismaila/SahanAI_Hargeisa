@@ -5,6 +5,7 @@ import {
   Marker, 
   Popup, 
   CircleMarker, 
+  Circle,
   useMap, 
   useMapEvents,
   LayersControl,
@@ -345,11 +346,11 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
         )}
 
         {hotspots && hotspots.features.map((feature, idx) => (
-          <CircleMarker 
+          <Circle 
             key={idx}
             center={[feature.geometry.coordinates[1], feature.geometry.coordinates[0]]}
-            radius={18}
-            pathOptions={{ color: '#e11d48', fillColor: '#e11d48', fillOpacity: 0.35, weight: 2 }}
+            radius={650}
+            pathOptions={{ color: '#e11d48', fillColor: '#e11d48', fillOpacity: 0.25, weight: 2 }}
           >
             <Popup>
               <div style={{ minWidth: '160px', color: '#1e293b' }}>
@@ -358,7 +359,7 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
                 <p style={{ margin: 0, fontSize: '0.85em', color: '#4b5563' }}>{feature.properties.reason}</p>
               </div>
             </Popup>
-          </CircleMarker>
+          </Circle>
         ))}
       </MapContainer>
     </div>

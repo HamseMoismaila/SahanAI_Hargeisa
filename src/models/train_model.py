@@ -182,11 +182,11 @@ class GrowthPredictor:
     def get_top_hotspots(self) -> dict:
         """Returns the top 5 highly realistic investment hotspots in Hargeisa."""
         hotspots = [
-            {"name": "Jigjiga Yar (University District)", "lat": 9.545, "lon": 44.025, "reason": "Rapid student housing expansion. High growth predicted.", "growth": "+22%"},
-            {"name": "Sha'ab (City Center)", "lat": 9.558, "lon": 44.062, "reason": "Premium commercial real estate. Stable, high base value.", "growth": "+8%"},
-            {"name": "Masalaha (South Airport Road)", "lat": 9.520, "lon": 44.070, "reason": "New infrastructure developments pushing land value up.", "growth": "+18%"},
-            {"name": "Ibrahim Koodbuur", "lat": 9.570, "lon": 44.050, "reason": "Growing residential demand driving consistent appreciation.", "growth": "+14%"},
-            {"name": "Hargeisa Club Area", "lat": 9.565, "lon": 44.075, "reason": "Historic high-value residential blocks.", "growth": "+10%"}
+            {"name": "Jigjiga Yar (University District)", "lat": 9.578, "lon": 44.032, "reason": "Rapid student housing expansion. High growth predicted.", "growth": "+22%"},
+            {"name": "Sha'ab (City Center)", "lat": 9.560, "lon": 44.065, "reason": "Premium commercial real estate. Stable, high base value.", "growth": "+8%"},
+            {"name": "Masalaha (South Airport Road)", "lat": 9.515, "lon": 44.078, "reason": "New infrastructure developments pushing land value up.", "growth": "+18%"},
+            {"name": "Ibrahim Koodbuur", "lat": 9.585, "lon": 44.052, "reason": "Growing residential demand driving consistent appreciation.", "growth": "+14%"},
+            {"name": "Hargeisa Club Area", "lat": 9.561, "lon": 44.069, "reason": "Historic high-value residential blocks.", "growth": "+10%"}
         ]
         
         features = []
