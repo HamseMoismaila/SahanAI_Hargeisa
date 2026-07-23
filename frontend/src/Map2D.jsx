@@ -207,6 +207,17 @@ function MapFlyTo({ coords, clearFlyTo, onSelection }) {
   return null;
 }
 
+// Fly Map to geosearched locations
+function MapSearchFlyer({ selectedLocation }) {
+  const map = useMap();
+  useEffect(() => {
+    if (selectedLocation) {
+      map.flyTo([selectedLocation.lat, selectedLocation.lng], 16, { duration: 1.5 });
+    }
+  }, [selectedLocation, map]);
+  return null;
+}
+
 export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiKey }) {
   const [ndbiTileUrl, setNdbiTileUrl] = useState('');
   const [hotspots, setHotspots] = useState(null);
@@ -537,6 +548,7 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
         />
         <GeomanDrawControls onSelection={onSelection} />
         <MapFlyTo coords={flyToCoords} clearFlyTo={clearFlyTo} onSelection={onSelection} />
+        <MapSearchFlyer selectedLocation={selectedLocation} />
 
         {/* Render interactive measuring path */}
         {isMeasuring && measurePoints.length > 0 && (
