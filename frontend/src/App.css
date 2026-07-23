@@ -744,8 +744,8 @@ body {
 /* Measurement Tool Panel UI */
 .measurement-control-panel {
   position: absolute;
-  top: 12px;
-  left: 60px;
+  bottom: 24px;
+  left: 24px;
   z-index: 1000;
   display: flex;
   gap: 8px;
