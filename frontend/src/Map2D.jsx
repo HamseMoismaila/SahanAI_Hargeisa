@@ -296,9 +296,9 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
 
     setSearchResults(filteredLocal);
 
-    // 2. Query OpenStreetMap Nominatim as fallback if no local matches found
-    if (filteredLocal.length === 0 && val.length > 2) {
-      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=Hargeisa+${encodeURIComponent(val)}`)
+    // 2. Concurrently query OSM Nominatim restricted to Hargeisa bounds as fallback
+    if (val.length > 2) {
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val)}&viewbox=43.85,9.42,44.25,9.68&bounded=1&countrycodes=so&limit=5`)
         .then(res => res.json())
         .then(data => {
           const osmMatches = data.map(item => ({
@@ -306,7 +306,13 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
             coords: [parseFloat(item.lat), parseFloat(item.lon)],
             type: "OSM Street Match"
           }));
-          setSearchResults(osmMatches);
+          
+          setSearchResults(prev => {
+            // Filter duplicates if any
+            const existingNames = new Set(prev.map(x => x.name.toLowerCase()));
+            const uniqueOsm = osmMatches.filter(x => !existingNames.has(x.name.toLowerCase()));
+            return [...prev, ...uniqueOsm];
+          });
         })
         .catch(err => console.error("OSM geocoding error:", err));
     }
