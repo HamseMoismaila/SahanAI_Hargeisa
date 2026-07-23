@@ -78,7 +78,17 @@ class GrowthPredictor:
         main_road = (9.5620, 44.0600)   # Hargeisa highway corridor
         schools = (9.5500, 44.0400)     # Primary school cluster area
         masjid = (9.5580, 44.0550)      # Neighborhood masjid cluster
-        laga_center = (9.5550, 44.0700) # Approximate center of a major laga
+        # Hargeisa actual winding dry riverbed (Laga) path nodes
+        laga_path = [
+            (9.5450, 43.9900),
+            (9.5480, 44.0200),
+            (9.5520, 44.0400),
+            (9.5550, 44.0550),
+            (9.5600, 44.0680),
+            (9.5650, 44.0850),
+            (9.5680, 44.1000),
+            (9.5780, 44.1300)
+        ]
         
         # Hilly topography coordinate indicators (e.g. Gacan Libaax / Northern Ridges)
         north_ridge = (9.5800, 44.0500)
@@ -91,7 +101,7 @@ class GrowthPredictor:
         dist_to_road = calc_dist((lat, lon), main_road)
         dist_to_school = calc_dist((lat, lon), schools)
         dist_to_masjid = calc_dist((lat, lon), masjid)
-        dist_to_laga = calc_dist((lat, lon), laga_center)
+        dist_to_laga = min(calc_dist((lat, lon), node) for node in laga_path)
         dist_to_ridge = calc_dist((lat, lon), north_ridge)
         
         # Base Price Calculation (Drops exponentially further from center)
