@@ -32,6 +32,12 @@ L.Icon.Default.mergeOptions({
 
 const HARGEISA_COORDS = [9.5600, 44.0650];
 
+// Focus map strictly on Hargeisa boundaries (prevent scrolling to other countries)
+const HARGEISA_BOUNDS = [
+  [9.4200, 43.8500], // Southwest coordinate bound
+  [9.6800, 44.2500]  // Northeast coordinate bound
+];
+
 // HWA Water Pipelines Real-world transmission & distribution branches
 const HWA_PIPELINES = [
   // Ged Deeble main transmission line (North to South)
@@ -103,11 +109,15 @@ function SearchField({ onLocationFound, googleApiKey }) {
   return null;
 }
 
-// Click Handler to capture selections
-function MapClickHandler({ onClick }) {
+// Click Handler to capture selections (or add points for measurement)
+function MapClickHandler({ onClick, isMeasuring, onAddMeasurePoint }) {
   useMapEvents({
     click(e) {
-      onClick(e.latlng);
+      if (isMeasuring) {
+        onAddMeasurePoint(e.latlng);
+      } else {
+        onClick(e.latlng);
+      }
     },
   });
   return null;
@@ -205,6 +215,10 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
   const [prediction, setPrediction] = useState(null);
   const [selectedYear, setSelectedYear] = useState(2026);
 
+  // Custom measuring tool states
+  const [isMeasuring, setIsMeasuring] = useState(false);
+  const [measurePoints, setMeasurePoints] = useState([]);
+
   useEffect(() => {
     // Only fetch hotspots list once on mount
     fetch('http://localhost:8080/api/hotspots')
@@ -236,10 +250,72 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
       .catch(err => console.error(err));
   }, [selectedLocation]);
 
+  // Geodesic distance calculation between segments (Haversine formula)
+  const calcSegmentDistance = (p1, p2) => {
+    const R = 6371000; // Earth radius in meters
+    const phi1 = p1.lat * Math.PI / 180;
+    const phi2 = p2.lat * Math.PI / 180;
+    const deltaPhi = (p2.lat - p1.lat) * Math.PI / 180;
+    const deltaLambda = (p2.lng - p1.lng) * Math.PI / 180;
+
+    const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+              Math.cos(phi1) * Math.cos(phi2) *
+              Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; 
+  };
+
+  const getCumulativeDistance = () => {
+    let total = 0;
+    for (let i = 0; i < measurePoints.length - 1; i++) {
+      total += calcSegmentDistance(measurePoints[i], measurePoints[i+1]);
+    }
+    return total;
+  };
+
+  const handleAddMeasurePoint = (latlng) => {
+    setMeasurePoints(prev => [...prev, latlng]);
+  };
+
   return (
     <div className="map-container-wrapper">
       <div className="map-tooltip">
-        Click anywhere to value, or draw a boundary using tools on the right.
+        {isMeasuring 
+          ? 'Measuring Mode: Click points on the map to calculate total distance.' 
+          : 'Click anywhere to value, or draw a boundary using tools on the right.'
+        }
+      </div>
+
+      {/* Floating Measurement Panel */}
+      <div className="measurement-control-panel">
+        <button 
+          type="button"
+          className={`measure-toggle-btn ${isMeasuring ? 'active' : ''}`}
+          onClick={(e) => {
+            e.preventDefault();
+            setIsMeasuring(!isMeasuring);
+            setMeasurePoints([]);
+          }}
+        >
+          {isMeasuring ? '🛑 Stop Measuring' : '📏 Measure Distance'}
+        </button>
+        {isMeasuring && measurePoints.length > 0 && (
+          <div className="measurement-result-bubble">
+            Distance: <strong>
+              {getCumulativeDistance() >= 1000 
+                ? `${(getCumulativeDistance() / 1000).toFixed(2)} km` 
+                : `${Math.round(getCumulativeDistance())} m`}
+            </strong>
+            <button 
+              type="button" 
+              className="clear-measure-btn"
+              onClick={(e) => { e.preventDefault(); setMeasurePoints([]); }}
+            >
+              Reset
+            </button>
+          </div>
+        )}
       </div>
 
       <MapContainer 
@@ -247,6 +323,8 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
         zoom={13} 
         minZoom={11}
         maxZoom={22}
+        maxBounds={HARGEISA_BOUNDS}
+        maxBoundsViscosity={1.0}
         style={{ height: '100%', width: '100%' }}
       >
         <LayersControl position="topright">
@@ -332,11 +410,30 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
         </LayersControl>
 
         <SearchField onLocationFound={(loc) => setSelectedLocation(loc)} googleApiKey={googleApiKey} />
-        <MapClickHandler onClick={(loc) => setSelectedLocation(loc)} />
+        <MapClickHandler 
+          onClick={(loc) => setSelectedLocation(loc)} 
+          isMeasuring={isMeasuring}
+          onAddMeasurePoint={handleAddMeasurePoint}
+        />
         <GeomanDrawControls onSelection={onSelection} />
         <MapFlyTo coords={flyToCoords} clearFlyTo={clearFlyTo} onSelection={onSelection} />
 
-        {selectedLocation && (
+        {/* Render interactive measuring path */}
+        {isMeasuring && measurePoints.length > 0 && (
+          <FeatureGroup>
+            <Polyline positions={measurePoints} pathOptions={{ color: '#3b82f6', weight: 4, dashArray: '5, 10' }} />
+            {measurePoints.map((pt, idx) => (
+              <CircleMarker 
+                key={`measure-dot-${idx}`} 
+                center={pt} 
+                radius={6} 
+                pathOptions={{ color: '#2563eb', fillColor: '#3b82f6', fillOpacity: 1 }} 
+              />
+            ))}
+          </FeatureGroup>
+        )}
+
+        {selectedLocation && !isMeasuring && (
           <Marker position={selectedLocation}>
             <Popup>
               <div style={{ minWidth: '150px', color: '#1e293b' }}>
