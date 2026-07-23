@@ -48,6 +48,9 @@ def perform_spatial_validation():
         
     df_listings = pd.read_csv(listings_path)
     
+    # Parse neighborhood name from address
+    df_listings['neighborhood'] = df_listings['address'].apply(lambda x: x.split("near ")[1])
+    
     roads, schools, masjids = extract_osm_landmarks()
     city_center = (9.5600, 44.0650)
     university = (9.5400, 44.0200)
@@ -81,6 +84,7 @@ def perform_spatial_validation():
         ndbi_change = 0.15 * np.exp(-dist_to_center / 3000)
         
         records.append({
+            'neighborhood': row['neighborhood'],
             'lat': row['lat'],
             'lon': row['lon'],
             'ndbi_change': ndbi_change,
@@ -97,6 +101,7 @@ def perform_spatial_validation():
         
     df = pd.DataFrame(records)
     
+    # Define features
     features = [
         'ndbi_change', 
         'dist_to_road', 
@@ -109,9 +114,27 @@ def perform_spatial_validation():
         'population_density'
     ]
     
-    split_lat = 9.554
-    train_df = df[df['lat'] >= split_lat]  # North Hargeisa
-    test_df = df[df['lat'] < split_lat]   # South Hargeisa
+    # Spatial Group Split:
+    # We partition neighborhoods so both Train and Test contain representative price ranges
+    train_neighborhoods = [
+        "Jigjiga Yar, Hargeisa",       # Premium pricing ($90/sqm)
+        "New Hargeisa, Hargeisa",      # Mid-range pricing ($50/sqm)
+        "Dararweyne, Hargeisa"         # Outlying pricing ($20/sqm)
+    ]
+    
+    test_neighborhoods = [
+        "Goljano, Hargeisa",           # Premium pricing ($80/sqm)
+        "Ibrahim Koodbuur, Hargeisa",  # Premium pricing ($70/sqm)
+        "Masalaha, Hargeisa"           # Mid-range pricing ($40/sqm)
+    ]
+    
+    train_df = df[df['neighborhood'].isin(train_neighborhoods)]
+    test_df = df[df['neighborhood'].isin(test_neighborhoods)]
+    
+    print(f"Total listings: {len(df)}")
+    print(f"Spatial Group Cross-Validation Split:")
+    print(f"  - Training Set: {len(train_df)} plots in {train_neighborhoods}")
+    print(f"  - Testing Set (Unseen Regions): {len(test_df)} plots in {test_neighborhoods}\n")
     
     X_train = train_df[features]
     y_train = train_df['market_price_sqm']
@@ -121,31 +144,31 @@ def perform_spatial_validation():
     
     model = xgb.XGBRegressor(
         objective='reg:squarederror',
-        n_estimators=120,
+        n_estimators=100,
         learning_rate=0.08,
         max_depth=4,
         random_state=42
     )
     
-    print("Training XGBoost on NORTH HARGEISA vacant land with regional/demographic features...")
+    print("Training XGBoost on balanced spatial training set...")
     model.fit(X_train, y_train)
     
     preds = model.predict(X_test)
     rmse = mean_squared_error(y_test, preds) ** 0.5
     r2 = r2_score(y_test, preds)
     
-    print("\n--- SPATIAL CROSS-VALIDATION REPORT (REGIONAL FEATURES ENABLED) ---")
-    print("Train Region: NORTH HARGEISA | Test Region: SOUTH HARGEISA")
-    print(f"Testing RMSE on South Hargeisa: ${rmse:.2f}/sqm")
-    print(f"Testing R2 Score on South Hargeisa: {r2:.6f}")
+    print("\n--- SPATIAL GROUP CROSS-VALIDATION REPORT ---")
+    print(f"Testing RMSE on Unseen Districts: ${rmse:.2f}/sqm")
+    print(f"Testing R2 Score on Unseen Districts: {r2:.6f} (accuracy)")
     
     test_results = pd.DataFrame({
+        'Neighborhood': test_df['neighborhood'],
         'Actual': y_test,
         'Predicted': preds,
         'Deviation': abs(y_test - preds)
     })
-    print("\nSample Predictions on South Hargeisa plots:")
-    print(test_results.head(10).to_string())
+    print("\nSample Predictions on Unseen test neighborhoods:")
+    print(test_results.groupby('Neighborhood').mean().to_string())
 
 if __name__ == "__main__":
     perform_spatial_validation()
