@@ -14,12 +14,10 @@ import {
   Polygon,
   Tooltip
 } from 'react-leaflet';
-import { GeoSearchControl, OpenStreetMapProvider, GoogleProvider } from 'leaflet-geosearch';
 import { area } from '@turf/area';
 import { polygon as turfPolygon } from '@turf/helpers';
 
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-geosearch/dist/geosearch.css';
 import '@geoman-io/leaflet-geoman-free';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 import L from 'leaflet';
@@ -38,6 +36,27 @@ const HARGEISA_COORDS = [9.5600, 44.0650];
 const HARGEISA_BOUNDS = [
   [9.4200, 43.8500], // Southwest coordinate bound
   [9.6800, 44.2500]  // Northeast coordinate bound
+];
+
+// High-accuracy Local Hargeisa Neighborhood Geocoder Index
+const HARGEISA_NEIGHBORHOODS_INDEX = [
+  { name: "Jigjiga Yar", coords: [9.5780, 44.0320], type: "Neighborhood (Xaafad)" },
+  { name: "Sha'ab (City Center)", coords: [9.5600, 44.0650], type: "CBD District" },
+  { name: "Dararweyne", coords: [9.5950, 44.1350], type: "Sub-City" },
+  { name: "Masalaha (South Airport Road)", coords: [9.5150, 44.0780], type: "District" },
+  { name: "Ibrahim Koodbuur", coords: [9.5850, 44.0520], type: "Sub-City" },
+  { name: "Mohamed Mooge District", coords: [9.5350, 44.0880], type: "District" },
+  { name: "State House (Madaxtooyada)", coords: [9.5670, 44.0670], type: "Landmark" },
+  { name: "Goljano", coords: [9.5630, 44.0850], type: "Neighborhood (Xaafad)" },
+  { name: "New Hargeisa (Hargeisa Cusub)", coords: [9.5520, 44.1050], type: "Neighborhood" },
+  { name: "Birjeex (Military HQ Area)", coords: [9.5540, 44.0450], type: "Landmark" },
+  { name: "Xera Awr", coords: [9.5700, 44.0520], type: "Neighborhood (Xaafad)" },
+  { name: "Dami", coords: [9.5800, 44.0680], type: "Neighborhood" },
+  { name: "Sinay Market", coords: [9.5620, 44.0580], type: "Commercial Zone" },
+  { name: "Pepsi Area (Gacan Libaax)", coords: [9.5720, 44.0950], type: "Neighborhood" },
+  { name: "Goraa", coords: [9.5100, 43.9900], type: "Sub-City" },
+  { name: "Kaabsan Gated Community", coords: [9.575657, 44.008923], type: "Premium Gated Community" },
+  { name: "Aragsan Gated Community", coords: [9.519872, 44.065421], type: "Premium Gated Community" }
 ];
 
 // HWA Water Pipelines Real-world transmission & distribution branches
@@ -86,59 +105,6 @@ const GATED_COMMUNITIES = [
   { name: "Kaabsan Gated Community", coords: [9.575657, 44.008923], details: "Premium diaspora housing project with paved access roads, high security, and landscaping." },
   { name: "Aragsan Gated Community", coords: [9.519872, 44.065421], details: "Modern secure gated estate featuring high-walled villa lots and private security." }
 ];
-
-// Search Component with Google Maps geocoding integration
-function SearchField({ onLocationFound, googleApiKey }) {
-  const map = useMap();
-
-  useEffect(() => {
-    // Dynamically choose Google Maps Provider if API key is present, fallback to OSM
-    const provider = googleApiKey 
-      ? new GoogleProvider({
-          params: {
-            key: googleApiKey,
-            language: 'en',
-            region: 'so'
-          }
-        })
-      : new OpenStreetMapProvider({
-          params: {
-            'accept-language': 'en',
-            countrycodes: 'so'
-          }
-        });
-
-    const searchControl = new GeoSearchControl({
-      provider: provider,
-      style: 'bar',
-      showMarker: false,
-      autoClose: true,
-      searchLabel: googleApiKey ? 'Search locations via Google Maps...' : 'Search Hargeisa locations...'
-    });
-
-    map.addControl(searchControl);
-
-    const container = map.getContainer();
-    const preventSubmit = (e) => {
-      if (e.target && e.target.tagName === 'FORM' && e.target.closest('.leaflet-control-geosearch')) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    };
-    container.addEventListener('submit', preventSubmit);
-
-    map.on('geosearch/showlocation', (result) => {
-      onLocationFound({ lat: result.location.y, lng: result.location.x });
-    });
-
-    return () => {
-      map.removeControl(searchControl);
-      container.removeEventListener('submit', preventSubmit);
-    };
-  }, [map, onLocationFound, googleApiKey]);
-
-  return null;
-}
 
 // Click Handler to capture selections (or add points for measurement)
 function MapClickHandler({ onClick, isMeasuring, onAddMeasurePoint }) {
@@ -223,7 +189,7 @@ function MapFlyTo({ coords, clearFlyTo, onSelection }) {
   const map = useMap();
   useEffect(() => {
     if (coords) {
-      map.flyTo(coords, 18, { duration: 1.5 });
+      map.flyTo(coords, 16, { duration: 1.5 });
       clearFlyTo();
       
       fetch(`http://localhost:8080/api/predict?lat=${coords[0]}&lon=${coords[1]}`)
@@ -249,6 +215,10 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
   // Custom measuring tool states
   const [isMeasuring, setIsMeasuring] = useState(false);
   const [measurePoints, setMeasurePoints] = useState([]);
+
+  // Autocomplete Geosearch states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     // Only fetch hotspots list once on mount
@@ -309,6 +279,43 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
     setMeasurePoints(prev => [...prev, latlng]);
   };
 
+  // Handle autocomplete geosearch logic
+  const handleSearchChange = (val) => {
+    setSearchQuery(val);
+    if (val.trim().length === 0) {
+      setSearchResults([]);
+      return;
+    }
+
+    // 1. Filter local high-accuracy neighborhood list
+    const filteredLocal = HARGEISA_NEIGHBORHOODS_INDEX.filter(item => 
+      item.name.toLowerCase().includes(val.toLowerCase())
+    );
+
+    setSearchResults(filteredLocal);
+
+    // 2. Query OpenStreetMap Nominatim as fallback if no local matches found
+    if (filteredLocal.length === 0 && val.length > 2) {
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=Hargeisa+${encodeURIComponent(val)}`)
+        .then(res => res.json())
+        .then(data => {
+          const osmMatches = data.map(item => ({
+            name: item.display_name.split(',')[0],
+            coords: [parseFloat(item.lat), parseFloat(item.lon)],
+            type: "OSM Street Match"
+          }));
+          setSearchResults(osmMatches);
+        })
+        .catch(err => console.error("OSM geocoding error:", err));
+    }
+  };
+
+  const handleSelectSearchResult = (result) => {
+    setSearchQuery(result.name);
+    setSearchResults([]);
+    setSelectedLocation({ lat: result.coords[0], lng: result.coords[1] });
+  };
+
   // Generate parallel corridor line arrays flanking Dooxa
   const dooxaPath = LAGA_CHANNELS[0];
   const northParallelPath = dooxaPath.map(pt => [pt[0] + 0.0035, pt[1]]);
@@ -321,6 +328,31 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
           ? 'Measuring Mode: Click points on the map to calculate total distance.' 
           : 'Click anywhere to value, or draw a boundary using tools on the right.'
         }
+      </div>
+
+      {/* Floating Local Autocomplete Geosearch Container */}
+      <div className="local-geosearch-bar">
+        <input 
+          type="text" 
+          placeholder="🔍 Search Jigjiga Yar, Mohamed Mooge, Sha'ab, or streets..."
+          value={searchQuery}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          className="local-geosearch-input"
+        />
+        {searchResults.length > 0 && (
+          <ul className="local-geosearch-dropdown">
+            {searchResults.map((res, idx) => (
+              <li 
+                key={idx} 
+                onClick={() => handleSelectSearchResult(res)}
+                className="geosearch-item"
+              >
+                <span className="item-name">{res.name}</span>
+                <span className="item-type">{res.type}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       {/* Floating Measurement Panel */}
@@ -490,7 +522,6 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
           </LayersControl.Overlay>
         </LayersControl>
 
-        <SearchField onLocationFound={(loc) => setSelectedLocation(loc)} googleApiKey={googleApiKey} />
         <MapClickHandler 
           onClick={(loc) => setSelectedLocation(loc)} 
           isMeasuring={isMeasuring}

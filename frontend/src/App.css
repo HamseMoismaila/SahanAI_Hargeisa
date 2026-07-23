@@ -807,3 +807,76 @@ body {
 .clear-measure-btn:hover {
   text-decoration: underline;
 }
+
+/* Custom Autocomplete Geosearch Panel */
+.local-geosearch-bar {
+  position: absolute;
+  top: 12px;
+  left: 60px;
+  z-index: 1100;
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+}
+
+.local-geosearch-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.local-geosearch-input:focus {
+  border-color: #3b82f6;
+  background-color: #1e293b;
+}
+
+.local-geosearch-dropdown {
+  list-style: none;
+  margin: 4px 0 0 0;
+  padding: 0;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+}
+
+.geosearch-item {
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #1e293b;
+  transition: background-color 0.15s ease;
+}
+
+.geosearch-item:last-child {
+  border-bottom: none;
+}
+
+.geosearch-item:hover {
+  background-color: #1e293b;
+  color: #ffffff;
+}
+
+.geosearch-item .item-name {
+  font-weight: 500;
+}
+
+.geosearch-item .item-type {
+  font-size: 0.7rem;
+  color: #38bdf8;
+  background-color: rgba(56, 189, 248, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
