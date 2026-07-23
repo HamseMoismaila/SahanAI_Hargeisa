@@ -109,8 +109,8 @@ class GrowthPredictor:
         dist_to_ridge = calc_dist((lat, lon), north_ridge)
         
         # Calculate distances to Gated Diaspora Communities (Kaabsan & Aragsan)
-        dist_to_kaabsan = calc_dist((lat, lon), (9.5850, 44.1150))
-        dist_to_aragsan = calc_dist((lat, lon), (9.5250, 44.0200))
+        dist_to_kaabsan = calc_dist((lat, lon), (9.575657, 44.008923))
+        dist_to_aragsan = calc_dist((lat, lon), (9.519872, 44.065421))
         
         # Proximity premiums (up to +35% with exponential decay over 1.5km buffer)
         diaspora_premium_kaabsan = 35.0 * np.exp(-dist_to_kaabsan / 1000.0)

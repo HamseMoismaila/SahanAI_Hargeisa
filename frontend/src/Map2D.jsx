@@ -82,8 +82,8 @@ const SOIL_ZONES = [
 ];
 
 const GATED_COMMUNITIES = [
-  { name: "Kaabsan Gated Community", coords: [9.5850, 44.1150], details: "Premium diaspora housing project with paved access roads, high security, and landscaping." },
-  { name: "Aragsan Gated Community", coords: [9.5250, 44.0200], details: "Modern secure gated estate featuring high-walled villa lots and private security." }
+  { name: "Kaabsan Gated Community", coords: [9.575657, 44.008923], details: "Premium diaspora housing project with paved access roads, high security, and landscaping." },
+  { name: "Aragsan Gated Community", coords: [9.519872, 44.065421], details: "Modern secure gated estate featuring high-walled villa lots and private security." }
 ];
 
 // Search Component with Google Maps geocoding integration
