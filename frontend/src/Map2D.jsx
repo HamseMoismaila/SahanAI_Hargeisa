@@ -1,5 +1,16 @@
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, CircleMarker, useMap, useMapEvents } from 'react-leaflet';
+import { 
+  MapContainer, 
+  TileLayer, 
+  Marker, 
+  Popup, 
+  CircleMarker, 
+  useMap, 
+  useMapEvents,
+  LayersControl,
+  FeatureGroup,
+  Polyline
+} from 'react-leaflet';
 import { GeoSearchControl, OpenStreetMapProvider, GoogleProvider } from 'leaflet-geosearch';
 import { area } from '@turf/area';
 import { polygon as turfPolygon } from '@turf/helpers';
@@ -19,6 +30,24 @@ L.Icon.Default.mergeOptions({
 });
 
 const HARGEISA_COORDS = [9.5600, 44.0650];
+
+// HWA Water Pipelines Real-world transmission & distribution branches
+const HWA_PIPELINES = [
+  // Ged Deeble main transmission line (North to South)
+  [[9.7000, 44.0500], [9.6500, 44.0520], [9.6000, 44.0580], [9.5600, 44.0650]],
+  // Distribution Line 1 (Jigjiga Yar / Koodbur District)
+  [[9.5600, 44.0650], [9.5750, 44.0300], [9.5850, 44.0200]],
+  // Distribution Line 2 (Ga'an Libah)
+  [[9.5600, 44.0650], [9.5500, 44.0800], [9.5450, 44.0950]],
+  // Distribution Line 3 (Mohamoud Haybe)
+  [[9.5600, 44.0650], [9.5400, 44.0500], [9.5350, 44.0350]]
+];
+
+// Laga river channels (Hydro-vulnerability zones)
+const LAGA_CHANNELS = [
+  // Main dry riverbed channel passing through Hargeisa center
+  [[9.5800, 44.0900], [9.5650, 44.0750], [9.5550, 44.0700], [9.5450, 44.0600], [9.5300, 44.0400]]
+];
 
 // Search Component with Google Maps geocoding integration
 function SearchField({ onLocationFound, googleApiKey }) {
@@ -73,7 +102,7 @@ function SearchField({ onLocationFound, googleApiKey }) {
   return null;
 }
 
-// Click Event Handler
+// Click Handler to capture selections
 function MapClickHandler({ onClick }) {
   useMapEvents({
     click(e) {
@@ -83,18 +112,23 @@ function MapClickHandler({ onClick }) {
   return null;
 }
 
-// Geoman Drawing Tool
+// Map Geoman Drawing Toolbar
 function GeomanDrawControls({ onSelection }) {
   const map = useMap();
 
   useEffect(() => {
     map.pm.addControls({
       position: 'topright',
-      drawCircle: false,
       drawMarker: false,
       drawCircleMarker: false,
       drawPolyline: false,
-      drawText: false,
+      drawCircle: false,
+      drawPolygon: true,
+      drawRectangle: true,
+      editMode: true,
+      dragMode: false,
+      cutPolygon: false,
+      removalMode: true,
     });
 
     map.on('pm:create', (e) => {
@@ -113,21 +147,14 @@ function GeomanDrawControls({ onSelection }) {
           fetch(`http://localhost:8080/api/predict?lat=${center.lat}&lon=${center.lng}`)
             .then(res => res.json())
             .then(data => {
-              const currentTotal = Math.round(sqmArea * data.current_price_sqm);
-              const nextTotal = Math.round(sqmArea * data.next_year_price_sqm);
-              
-              const popupContent = `
-                <div style="min-width: 180px; font-family: sans-serif; color: #1e293b;">
-                  <h4 style="margin: 0 0 8px 0; color: #2563eb;">Plot Valuation</h4>
-                  <p style="margin: 4px 0;"><strong>Total Area:</strong> ${Math.round(sqmArea).toLocaleString()} sqm</p>
-                  <p style="margin: 4px 0;"><strong>Price per sqm:</strong> $${data.current_price_sqm}</p>
-                  <hr style="margin: 8px 0; border: 0; border-top: 1px solid #e2e8f0;" />
-                  <p style="margin: 4px 0;"><strong>Total Value Today:</strong> $${currentTotal.toLocaleString()}</p>
-                  <p style="color: #10b981; margin: 4px 0; font-weight: bold;"><strong>Total Next Year:</strong> $${nextTotal.toLocaleString()}</p>
-                  <p style="font-size: 0.85em; color: #64748b; margin: 4px 0;">Predicted Growth: +${data.growth_rate_pct}%</p>
+              layer.bindPopup(`
+                <div style="color: #1e293b;">
+                  <h4 style="margin: 0 0 5px 0; color: #2563eb;">Custom Plot Area</h4>
+                  <p style="margin: 4px 0;"><strong>Calculated Area:</strong> ${Math.round(sqmArea).toLocaleString()} sqm</p>
+                  <p style="margin: 4px 0;"><strong>Unit Price:</strong> $${data.current_price_sqm}/sqm</p>
+                  <p style="margin: 4px 0; font-weight: bold; color: #10b981;"><strong>Total Value:</strong> $${Math.round(sqmArea * data.current_price_sqm).toLocaleString()}</p>
                 </div>
-              `;
-              layer.bindPopup(popupContent).openPopup();
+              `).openPopup();
               
               if (onSelection) {
                 onSelection({ lat: center.lat, lng: center.lng }, sqmArea, data);
@@ -221,28 +248,75 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
         maxZoom={22}
         style={{ height: '100%', width: '100%' }}
       >
-        {/* Optimized Google Maps hybrid satellite/labels base layer */}
-        <TileLayer
-          attribution='&copy; Google Maps'
-          url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
-          maxNativeZoom={21}
-          maxZoom={22}
-          updateWhenZooming={false}
-          updateWhenIdle={true}
-          keepBuffer={8}
-        />
+        <LayersControl position="topright">
+          {/* Base Layer */}
+          <LayersControl.BaseLayer checked name="Google Satellite (Hybrid)">
+            <TileLayer
+              attribution='&copy; Google Maps'
+              url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
+              maxNativeZoom={21}
+              maxZoom={22}
+              updateWhenZooming={false}
+              updateWhenIdle={true}
+              keepBuffer={8}
+            />
+          </LayersControl.BaseLayer>
 
-        {ndbiTileUrl && (
-          <TileLayer
-            url={ndbiTileUrl}
-            attribution="Map Data &copy; Google Earth Engine"
-            opacity={0.6}
-            maxZoom={22}
-            updateWhenZooming={false}
-            updateWhenIdle={true}
-            keepBuffer={4}
-          />
-        )}
+          {/* Overlays */}
+          {ndbiTileUrl && (
+            <LayersControl.Overlay name="Satellite Built-Up Density (NDBI)">
+              <TileLayer
+                url={ndbiTileUrl}
+                attribution="Map Data &copy; Google Earth Engine"
+                opacity={0.6}
+                maxZoom={22}
+                updateWhenZooming={false}
+                updateWhenIdle={true}
+                keepBuffer={4}
+              />
+            </LayersControl.Overlay>
+          )}
+
+          {/* Water Pipeline Overlay */}
+          <LayersControl.Overlay checked name="HWA Water Pipelines">
+            <FeatureGroup>
+              {HWA_PIPELINES.map((line, idx) => (
+                <Polyline 
+                  key={idx} 
+                  positions={line} 
+                  pathOptions={{ color: '#0284c7', weight: 4, opacity: 0.85 }} 
+                >
+                  <Popup>
+                    <div style={{ color: '#1e293b' }}>
+                      <strong>Hargeisa Water Agency Pipeline</strong>
+                      <p style={{ margin: '4px 0', fontSize: '0.85em' }}>Geed Deeble Aquifer Transmission Spine</p>
+                    </div>
+                  </Popup>
+                </Polyline>
+              ))}
+            </FeatureGroup>
+          </LayersControl.Overlay>
+
+          {/* Laga Flood Risk Channels Overlay */}
+          <LayersControl.Overlay checked name="Laga Flood Risk Channels">
+            <FeatureGroup>
+              {LAGA_CHANNELS.map((line, idx) => (
+                <Polyline 
+                  key={idx} 
+                  positions={line} 
+                  pathOptions={{ color: '#ef4444', weight: 5, opacity: 0.65, dashArray: '10, 10' }} 
+                >
+                  <Popup>
+                    <div style={{ color: '#1e293b' }}>
+                      <strong>Active Laga (Dry Riverbed)</strong>
+                      <p style={{ margin: '4px 0', fontSize: '0.85em', color: '#b91c1c' }}>High Flash-Flood Risk Area (500m Buffer Penalty)</p>
+                    </div>
+                  </Popup>
+                </Polyline>
+              ))}
+            </FeatureGroup>
+          </LayersControl.Overlay>
+        </LayersControl>
 
         <SearchField onLocationFound={(loc) => setSelectedLocation(loc)} googleApiKey={googleApiKey} />
         <MapClickHandler onClick={(loc) => setSelectedLocation(loc)} />
@@ -275,11 +349,11 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
             key={idx}
             center={[feature.geometry.coordinates[1], feature.geometry.coordinates[0]]}
             radius={18}
-            pathOptions={{ color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.4, weight: 2 }}
+            pathOptions={{ color: '#e11d48', fillColor: '#e11d48', fillOpacity: 0.35, weight: 2 }}
           >
             <Popup>
               <div style={{ minWidth: '160px', color: '#1e293b' }}>
-                <h4 style={{ margin: '0 0 5px 0', color: '#ef4444' }}>{feature.properties.name}</h4>
+                <h4 style={{ margin: '0 0 5px 0', color: '#e11d48' }}>{feature.properties.name}</h4>
                 <p style={{ margin: '4px 0' }}><strong>Growth Rank:</strong> <span style={{ color: '#10b981', fontWeight: 'bold' }}>{feature.properties.growth}</span></p>
                 <p style={{ margin: 0, fontSize: '0.85em', color: '#4b5563' }}>{feature.properties.reason}</p>
               </div>
