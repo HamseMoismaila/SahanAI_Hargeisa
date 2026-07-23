@@ -81,17 +81,7 @@ const SOIL_ZONES = [
   }
 ];
 
-// Newly graded and asphalted roads in the last 4 years (Mooge Administration District Projects)
-const NEW_ROADS = [
-  // 1. The 22.5km Hargeisa Bypass Road (Outer Southern Truck loop diverting port traffic)
-  [[9.5650, 44.1350], [9.5450, 44.1150], [9.5250, 44.0900], [9.5080, 44.0500], [9.5120, 43.9900], [9.5450, 43.9500]],
-  
-  // 2. The 13km 150 Ring Road (Major northern transit loop linking Koodbuur, Jigjiga Yar, and east)
-  [[9.5850, 44.0150], [9.5880, 44.0350], [9.5810, 44.0550], [9.5780, 44.0900], [9.5550, 44.1100], [9.5510, 44.1150]],
-  
-  // 3. Taiwan Avenue (Airport Connector Link from Central Road No. 1 to Egal Airport Terminal)
-  [[9.5550, 44.0650], [9.5400, 44.0550], [9.5200, 44.0720]]
-];
+
 
 // Search Component with Google Maps geocoding integration
 function SearchField({ onLocationFound, googleApiKey }) {
@@ -433,26 +423,6 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
                     </div>
                   </Popup>
                 </Polygon>
-              ))}
-            </FeatureGroup>
-          </LayersControl.Overlay>
-
-          {/* New Roads Overlay */}
-          <LayersControl.Overlay checked name="New Roads (Last 4 Years)">
-            <FeatureGroup>
-              {NEW_ROADS.map((road, idx) => (
-                <Polyline
-                  key={idx}
-                  positions={road}
-                  pathOptions={{ color: '#f97316', weight: 3.5, opacity: 0.9 }}
-                >
-                  <Popup>
-                    <div style={{ color: '#1e293b' }}>
-                      <strong>Newly Constructed Road</strong>
-                      <p style={{ margin: '4px 0', fontSize: '0.85em', color: '#ea580c' }}>Graded/Asphalted by Municipal Council (2022-2026)</p>
-                    </div>
-                  </Popup>
-                </Polyline>
               ))}
             </FeatureGroup>
           </LayersControl.Overlay>
