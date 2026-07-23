@@ -108,6 +108,25 @@ class GrowthPredictor:
         dist_to_laga = min(calc_dist((lat, lon), node) for node in laga_path)
         dist_to_ridge = calc_dist((lat, lon), north_ridge)
         
+        # Calculate distances to Gated Diaspora Communities (Kaabsan & Aragsan)
+        dist_to_kaabsan = calc_dist((lat, lon), (9.5850, 44.1150))
+        dist_to_aragsan = calc_dist((lat, lon), (9.5250, 44.0200))
+        
+        # Proximity premiums (up to +35% with exponential decay over 1.5km buffer)
+        diaspora_premium_kaabsan = 35.0 * np.exp(-dist_to_kaabsan / 1000.0)
+        diaspora_premium_aragsan = 35.0 * np.exp(-dist_to_aragsan / 1000.0)
+        
+        if diaspora_premium_kaabsan >= diaspora_premium_aragsan:
+            diaspora_premium_pct = round(diaspora_premium_kaabsan, 1)
+            diaspora_community_name = "Kaabsan Gated Community"
+        else:
+            diaspora_premium_pct = round(diaspora_premium_aragsan, 1)
+            diaspora_community_name = "Aragsan Gated Community"
+            
+        if diaspora_premium_pct < 5.0:
+            diaspora_premium_pct = 0.0
+            diaspora_community_name = "None"
+
         # Base Price Calculation (Drops exponentially further from center)
         base_price_sqm = 250 * np.exp(-dist_to_center / 3000) 
         
@@ -122,7 +141,8 @@ class GrowthPredictor:
         if dist_to_laga < 500:
             laga_penalty_multiplier = 0.7 + (0.3 * (dist_to_laga / 500))
             
-        current_price = (base_price_sqm + uni_premium + road_premium + school_premium + masjid_premium) * laga_penalty_multiplier
+        diaspora_multiplier = 1.0 + (diaspora_premium_pct / 100.0)
+        current_price = (base_price_sqm + uni_premium + road_premium + school_premium + masjid_premium) * laga_penalty_multiplier * diaspora_multiplier
         current_price = max(10, current_price) # Minimum $10/sqm
         
         # Appreciation Rate
@@ -181,7 +201,9 @@ class GrowthPredictor:
             "road_access": road_access,
             "slope_grade_pct": slope_grade,
             "foundation_surcharge_pct": foundation_surcharge,
-            "excavation_soil": excavation_soil
+            "excavation_soil": excavation_soil,
+            "diaspora_premium_pct": diaspora_premium_pct,
+            "diaspora_community_name": diaspora_community_name
         }
         
     def get_top_hotspots(self) -> dict:

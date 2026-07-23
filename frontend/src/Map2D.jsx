@@ -81,7 +81,10 @@ const SOIL_ZONES = [
   }
 ];
 
-
+const GATED_COMMUNITIES = [
+  { name: "Kaabsan Gated Community", coords: [9.5850, 44.1150], details: "Premium diaspora housing project with paved access roads, high security, and landscaping." },
+  { name: "Aragsan Gated Community", coords: [9.5250, 44.0200], details: "Modern secure gated estate featuring high-walled villa lots and private security." }
+];
 
 // Search Component with Google Maps geocoding integration
 function SearchField({ onLocationFound, googleApiKey }) {
@@ -423,6 +426,28 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
                     </div>
                   </Popup>
                 </Polygon>
+              ))}
+            </FeatureGroup>
+          </LayersControl.Overlay>
+
+          {/* Gated Diaspora Communities Overlay */}
+          <LayersControl.Overlay checked name="Gated Diaspora Communities">
+            <FeatureGroup>
+              {GATED_COMMUNITIES.map((gc, idx) => (
+                <Circle
+                  key={idx}
+                  center={gc.coords}
+                  radius={600}
+                  pathOptions={{ color: '#8b5cf6', fillColor: '#a78bfa', fillOpacity: 0.25, weight: 2.5 }}
+                >
+                  <Popup>
+                    <div style={{ minWidth: '160px', color: '#1e293b' }}>
+                      <strong style={{ color: '#7c3aed' }}>{gc.name}</strong>
+                      <p style={{ margin: '4px 0', fontSize: '0.85em' }}>{gc.details}</p>
+                      <p style={{ margin: '4px 0', fontSize: '0.85em', color: '#7c3aed' }}><strong>Diaspora Buffer Premium Zone</strong> (up to +35% impact)</p>
+                    </div>
+                  </Popup>
+                </Circle>
               ))}
             </FeatureGroup>
           </LayersControl.Overlay>

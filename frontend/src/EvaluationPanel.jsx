@@ -93,7 +93,9 @@ export default function EvaluationPanel({
       roadAccess: prediction ? prediction.road_access : 'Calculating...',
       slopeGrade: prediction ? prediction.slope_grade_pct : 1.5,
       foundationSurcharge: prediction ? prediction.foundation_surcharge_pct : 0,
-      excavationSoil: prediction ? prediction.excavation_soil : 'Clay & Silt Mix'
+      excavationSoil: prediction ? prediction.excavation_soil : 'Clay & Silt Mix',
+      diasporaPremium: prediction ? prediction.diaspora_premium_pct : 0.0,
+      diasporaCommunity: prediction ? prediction.diaspora_community_name : 'None'
     });
   };
 
@@ -154,6 +156,7 @@ export default function EvaluationPanel({
                 <div className="comp-metric">Road: <strong>{item.roadAccess}</strong></div>
                 <div className="comp-metric">Soil: <strong>{item.excavationSoil}</strong></div>
                 <div className="comp-metric">Surcharge: <strong className={item.foundationSurcharge > 0 ? "text-danger" : ""}>+{item.foundationSurcharge}%</strong></div>
+                <div className="comp-metric">Diaspora Premium: <strong style={{ color: item.diasporaPremium > 0 ? '#10b981' : '#94a3b8' }}>{item.diasporaPremium > 0 ? `+${item.diasporaPremium}%` : 'None'}</strong></div>
               </div>
             ))}
             
@@ -256,6 +259,14 @@ export default function EvaluationPanel({
                 <li>
                   <span>Access Road Classification</span>
                   <strong>{prediction ? prediction.road_access : 'Calculating...'}</strong>
+                </li>
+                <li>
+                  <span>Diaspora Premium Impact</span>
+                  <strong style={{ color: prediction && prediction.diaspora_premium_pct > 0 ? '#10b981' : '#94a3b8' }}>
+                    {prediction && prediction.diaspora_premium_pct > 0 
+                      ? `+${prediction.diaspora_premium_pct}% (${prediction.diaspora_community_name === 'Kaabsan Gated Community' ? 'Kaabsan' : 'Aragsan'})` 
+                      : 'None'}
+                  </strong>
                 </li>
               </ul>
             </div>
