@@ -88,7 +88,12 @@ export default function EvaluationPanel({
       holdingYears: holdingYears,
       futureValue: futureValue,
       roi: totalRoi,
-      proximity: getProximityData(selection.lat, selection.lng)
+      proximity: getProximityData(selection.lat, selection.lng),
+      waterAccess: prediction ? prediction.water_access : 'Calculating...',
+      roadAccess: prediction ? prediction.road_access : 'Calculating...',
+      slopeGrade: prediction ? prediction.slope_grade_pct : 1.5,
+      foundationSurcharge: prediction ? prediction.foundation_surcharge_pct : 0,
+      excavationSoil: prediction ? prediction.excavation_soil : 'Clay & Silt Mix'
     });
   };
 
@@ -144,11 +149,11 @@ export default function EvaluationPanel({
               <div key={idx} className="comparison-card">
                 <div className="comp-title">Plot {idx + 1} ({item.plotLabel})</div>
                 <div className="comp-metric">Valuation: <strong>${item.totalValue.toLocaleString()}</strong></div>
-                <div className="comp-metric">Growth: <strong className="text-success">+{item.growthRate.toFixed(1)}%</strong></div>
                 <div className="comp-metric">ROI ({item.holdingYears} yr): <strong className="text-success">{item.roi}%</strong></div>
-                <div className="comp-metric">Center: <strong>{(item.proximity.distToCenter / 1000).toFixed(2)} km</strong></div>
-                <div className="comp-metric">Road: <strong>{(item.proximity.distToRoad / 1000).toFixed(2)} km</strong></div>
-                <div className="comp-metric">Masjid: <strong>{item.proximity.distToMasjid} m</strong></div>
+                <div className="comp-metric">Water: <strong>{item.waterAccess}</strong></div>
+                <div className="comp-metric">Road: <strong>{item.roadAccess}</strong></div>
+                <div className="comp-metric">Soil: <strong>{item.excavationSoil}</strong></div>
+                <div className="comp-metric">Surcharge: <strong className={item.foundationSurcharge > 0 ? "text-danger" : ""}>+{item.foundationSurcharge}%</strong></div>
               </div>
             ))}
             
@@ -240,9 +245,50 @@ export default function EvaluationPanel({
               </div>
             </div>
 
+            {/* Local Utilities & Infrastructure (Point 2) */}
+            <div className="analytics-card">
+              <div className="card-label">Utility & Access Feasibility</div>
+              <ul className="proximity-list">
+                <li>
+                  <span>Water Supply Network</span>
+                  <strong>{prediction ? prediction.water_access : 'Calculating...'}</strong>
+                </li>
+                <li>
+                  <span>Access Road Classification</span>
+                  <strong>{prediction ? prediction.road_access : 'Calculating...'}</strong>
+                </li>
+              </ul>
+            </div>
+
+            {/* Geotechnical & Topography Estimator (Point 4) */}
+            <div className="analytics-card">
+              <div className="card-label">Topography & Foundation Estimator</div>
+              <ul className="proximity-list">
+                <li>
+                  <span>Estimated Ground Slope</span>
+                  <strong>{prediction ? `${prediction.slope_grade_pct}%` : 'Calculating...'}</strong>
+                </li>
+                <li>
+                  <span>Excavation Soil Profile</span>
+                  <strong>{prediction ? prediction.excavation_soil : 'Calculating...'}</strong>
+                </li>
+                <li>
+                  <span>Foundation Cost Surcharge</span>
+                  <strong className={prediction && prediction.foundation_surcharge_pct > 0 ? "text-danger" : ""}>
+                    {prediction ? `+${prediction.foundation_surcharge_pct}%` : 'Calculating...'}
+                  </strong>
+                </li>
+                {prediction && prediction.foundation_surcharge_pct > 0 && (
+                  <li className="warning-note" style={{ fontSize: '0.75rem', color: '#f87171', paddingLeft: '5px' }}>
+                    * Surcharge applies due to steep slope requiring retaining walls/reinforced foundations.
+                  </li>
+                )}
+              </ul>
+            </div>
+
             {/* Spatial Infrastructure Features */}
             <div className="analytics-card">
-              <div className="card-label">Spatial Proximity</div>
+              <div className="card-label">Spatial Proximity Landmarks</div>
               <ul className="proximity-list">
                 <li>
                   <span>Distance to Sha'ab (Center)</span>

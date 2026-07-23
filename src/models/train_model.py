@@ -80,6 +80,9 @@ class GrowthPredictor:
         masjid = (9.5580, 44.0550)      # Neighborhood masjid cluster
         laga_center = (9.5550, 44.0700) # Approximate center of a major laga
         
+        # Hilly topography coordinate indicators (e.g. Gacan Libaax / Northern Ridges)
+        north_ridge = (9.5800, 44.0500)
+        
         def calc_dist(p1, p2):
             return np.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2) * 111000 # ~meters
         
@@ -89,6 +92,7 @@ class GrowthPredictor:
         dist_to_school = calc_dist((lat, lon), schools)
         dist_to_masjid = calc_dist((lat, lon), masjid)
         dist_to_laga = calc_dist((lat, lon), laga_center)
+        dist_to_ridge = calc_dist((lat, lon), north_ridge)
         
         # Base Price Calculation (Drops exponentially further from center)
         base_price_sqm = 250 * np.exp(-dist_to_center / 3000) 
@@ -107,20 +111,63 @@ class GrowthPredictor:
         current_price = (base_price_sqm + uni_premium + road_premium + school_premium + masjid_premium) * laga_penalty_multiplier
         current_price = max(10, current_price) # Minimum $10/sqm
         
-        # Appreciation Rate (Growth is highest in developing outskirts, not saturated center)
-        # Center grows at ~5-8%, Outskirts (especially near university & infrastructure) grow at 15-25%
+        # Appreciation Rate
         base_growth = 0.05 + (min(dist_to_center, 5000) / 5000) * 0.10
         uni_growth_bonus = 0.10 * np.exp(-dist_to_uni / 2000)
         road_growth_bonus = 0.05 * np.exp(-dist_to_road / 1500)
         
         appreciation = base_growth + uni_growth_bonus + road_growth_bonus
-        
         next_year_price = current_price * (1 + appreciation)
         
+        # --- Localized Features (Point 2: Utilities & Road) ---
+        # Water Supply Zone (piped within 2.5km of center or university)
+        if dist_to_center < 2500 or dist_to_uni < 2000:
+            water_access = "Piped Municipal (HWA Network)"
+        else:
+            water_access = "Private Water Truck Basin"
+            
+        # Access Road Type based on proximity to highway corridor
+        if dist_to_road < 400:
+            road_access = "Paved Asphalt (Laami)"
+        elif dist_to_road < 1200:
+            road_access = "Graded Gravel (Carro-Cad)"
+        else:
+            road_access = "Unpaved Dirt Track"
+
+        # --- Localized Features (Point 4: Construction & Slope Surcharges) ---
+        # Slope calculations based on proximity to ridges
+        if dist_to_ridge < 1500:
+            slope_grade = round(12 - (dist_to_ridge / 150), 1) # steep hill
+            slope_grade = max(3.0, slope_grade)
+        else:
+            slope_grade = round(1.5 + (dist_to_center / 4000), 1)
+            slope_grade = min(8.0, slope_grade)
+
+        # Foundation surcharge based on slope steepness
+        if slope_grade >= 8.0:
+            foundation_surcharge = 25 # +25% retaining walls required
+        elif slope_grade >= 3.5:
+            foundation_surcharge = 10 # +10% moderate grading
+        else:
+            foundation_surcharge = 0  # standard foundation
+            
+        # Excavation soil profiles
+        if dist_to_ridge < 1800:
+            excavation_soil = "Hard Limestone Rock"
+        elif dist_to_laga < 400:
+            excavation_soil = "Soft Sandy Soil"
+        else:
+            excavation_soil = "Clay & Silt Mix"
+
         return {
             "current_price_sqm": round(current_price, 2),
             "next_year_price_sqm": round(next_year_price, 2),
-            "growth_rate_pct": round(appreciation * 100, 2)
+            "growth_rate_pct": round(appreciation * 100, 2),
+            "water_access": water_access,
+            "road_access": road_access,
+            "slope_grade_pct": slope_grade,
+            "foundation_surcharge_pct": foundation_surcharge,
+            "excavation_soil": excavation_soil
         }
         
     def get_top_hotspots(self) -> dict:
