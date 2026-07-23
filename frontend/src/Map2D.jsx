@@ -156,11 +156,13 @@ function GeomanDrawControls({ onSelection }) {
             .then(res => res.json())
             .then(data => {
               layer.bindPopup(`
-                <div style="color: #1e293b;">
+                <div style="color: #1e293b; min-width: 170px;">
                   <h4 style="margin: 0 0 5px 0; color: #2563eb;">Custom Plot Area</h4>
-                  <p style="margin: 4px 0;"><strong>Calculated Area:</strong> ${Math.round(sqmArea).toLocaleString()} sqm</p>
-                  <p style="margin: 4px 0;"><strong>Unit Price:</strong> $${data.current_price_sqm}/sqm</p>
-                  <p style="margin: 4px 0; font-weight: bold; color: #10b981;"><strong>Total Value:</strong> $${Math.round(sqmArea * data.current_price_sqm).toLocaleString()}</p>
+                  <p style="margin: 3px 0;"><strong>Calculated Area:</strong> ${Math.round(sqmArea).toLocaleString()} sqm</p>
+                  <p style="margin: 3px 0;"><strong>Unit Price:</strong> $${data.current_price_sqm}/sqm</p>
+                  <p style="margin: 3px 0; color: #1e293b;"><strong>Today's Value:</strong> $${Math.round(sqmArea * data.current_price_sqm).toLocaleString()}</p>
+                  <p style="margin: 3px 0; color: #10b981; font-weight: bold;"><strong>Next Year Value:</strong> $${Math.round(sqmArea * data.next_year_price_sqm).toLocaleString()}</p>
+                  <p style="margin: 3px 0; font-size: 0.9em; color: #4b5563;"><strong>Projected Growth:</strong> +${data.growth_rate_pct}%</p>
                 </div>
               `).openPopup();
               
