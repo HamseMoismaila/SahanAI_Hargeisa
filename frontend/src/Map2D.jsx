@@ -301,16 +301,28 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
           {/* Laga Flood Risk Channels Overlay */}
           <LayersControl.Overlay checked name="Laga Flood Risk Channels">
             <FeatureGroup>
+              {/* 500m Active Flood Risk Buffer Zone Corridor (Meters-based Scale-aware) */}
+              {LAGA_CHANNELS[0].map((coords, idx) => (
+                <Circle
+                  key={`buffer-${idx}`}
+                  center={coords}
+                  radius={500}
+                  pathOptions={{ color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.08, weight: 0 }}
+                  interactive={false}
+                />
+              ))}
+              
+              {/* Dashed Centerline of the Dooxa */}
               {LAGA_CHANNELS.map((line, idx) => (
                 <Polyline 
                   key={idx} 
                   positions={line} 
-                  pathOptions={{ color: '#ef4444', weight: 5, opacity: 0.65, dashArray: '10, 10' }} 
+                  pathOptions={{ color: '#ef4444', weight: 4, opacity: 0.75, dashArray: '8, 8' }} 
                 >
                   <Popup>
                     <div style={{ color: '#1e293b' }}>
-                      <strong>Active Laga (Dry Riverbed)</strong>
-                      <p style={{ margin: '4px 0', fontSize: '0.85em', color: '#b91c1c' }}>High Flash-Flood Risk Area (500m Buffer Penalty)</p>
+                      <strong>Active Laga (Dooxa Hargeisa)</strong>
+                      <p style={{ margin: '4px 0', fontSize: '0.85em', color: '#b91c1c' }}>High Flash-Flood Risk Area (500m Buffer Surcharge / Valuation Penalty)</p>
                     </div>
                   </Popup>
                 </Polyline>
