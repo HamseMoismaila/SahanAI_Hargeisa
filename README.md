@@ -37,7 +37,7 @@ To provide Hargeisa developers with actionable analysis, the platform computes:
 The platform calculates valuations and investment returns in three stages:
 
 ### Stage 1: Spatial Proximity & Pricing Engine (Backend)
-When a coordinate is queried on the map, the backend ([train_model.py](file:///C:/Users/User/OneDrive%20-%20Nilai%20University/Desktop/goobta/src/models/train_model.py)) computes the Euclidean distance (converted to meters using the UTM scale factor) between the selected point and primary Hargeisa landmarks and infrastructure nodes.
+When a coordinate is queried on the map, the backend ([train_model.py](src/models/train_model.py)) computes the Euclidean distance (converted to meters using the UTM scale factor) between the selected point and primary Hargeisa landmarks and infrastructure nodes.
 
 $$\text{Current Price per sqm} = (\text{Base Price} + \text{University Premium} + \text{Road Premium} + \text{School Premium} + \text{Masjid Premium}) \times \text{Dooxa Penalty Multiplier}$$
 
@@ -49,7 +49,7 @@ The annual growth rate is dynamically simulated based on urban expansion corrido
 $$\text{Next Year Price} = \text{Current Price} \times (1 + \text{Appreciation Rate})$$
 
 ### Stage 3: Plot Scale & ROI Compounding (Frontend)
-The React frontend ([EvaluationPanel.jsx](file:///C:/Users/User/OneDrive%20-%20Nilai%20University/Desktop/goobta/frontend/src/EvaluationPanel.jsx)) aggregates the base price per sqm relative to the chosen plot dimensions:
+The React frontend ([EvaluationPanel.jsx](frontend/src/EvaluationPanel.jsx)) aggregates the base price per sqm relative to the chosen plot dimensions:
 * **Per sqm Unit**: Area = $1\text{ sqm}$
 * **Standard Small Plot**: Area = $18\text{m} \times 12\text{m} = 216\text{ sqm}$
 * **Standard Large Plot**: Area = $24\text{m} \times 18\text{m} = 432\text{ sqm}$
@@ -58,6 +58,56 @@ The React frontend ([EvaluationPanel.jsx](file:///C:/Users/User/OneDrive%20-%20N
 The future value is compounded annually for the user-selected holding period ($n$ years):
 
 $$\text{Future Value} = \text{Current Value} \times (1 + \text{Appreciation Rate})^n$$
+
+---
+
+## 📊 Goobta AI Sahan: Data Sourcing & Synthesis Methodology
+
+In Somaliland, the absence of a formal Multiple Listing Service (MLS), localized census data, and centralized zoning maps presents a unique data acquisition challenge. To power the **Goobta AI Sahan** model, a multimodal data pipeline was engineered to harvest, clean, and spatio-temporally align remote sensing, geospatial, and unstructured listing data.
+
+Below is the step-by-step breakdown of how the dataset was constructed:
+
+### 1. Unstructured Property Listings (Scraped Valuation Data)
+- **Sources:** Custom web scrapers target unstructured public listings on local classified portals (e.g., *Hargeisa Homes*, *Somaliland Real Estate*) and community-driven Facebook Marketplace/Listing groups (e.g., *Guryaha Hargeysa*, *Dhulka Iibka ah ee Hargeysa*) using **Playwright** and **BeautifulSoup**.
+- **Extraction Pipeline:**
+  - Raw posts are scraped and parsed to extract:
+    - **Price:** Normalizes currency to USD (automatically converting Somaliland Shilling amounts using historic exchange rate tables).
+    - **Dimensions:** Extracts land size from colloquial Somali terms (e.g., *"Boos"* or *"10x20"* which translates to $200\text{ m}^2$).
+    - **Location Anchors:** Identifies district names and landmarks (e.g., *"Jigjiga Yar, near the Turkish School"*, *"Koodbuur behind Mansoor Hotel"*).
+- **Algorithmic Geocoding:**
+  - Because Hargeisa has no formal zip codes or addresses, a **Named Entity Recognition (NER)** model parses location descriptions.
+  - These names are cross-referenced with a local **Points of Interest (POI)** spatial dictionary compiled from OpenStreetMap and the Google Maps API, assigning estimated GPS coordinates (Latitude/Longitude centroids) to each property.
+
+### 2. Satellite-Derived Urban Expansion (NDBI Density Delta)
+- **Source:** Landsat-8 and Sentinel-2 Surface Reflectance (SR) archives accessed via the **Google Earth Engine (GEE)** API.
+- **Bands Used:** Near-Infrared (NIR, Band 8 on Sentinel-2) and Short-Wave Infrared (SWIR-1, Band 11 on Sentinel-2).
+- **Index Formulation (NDBI):**
+  $$\text{NDBI} = \frac{\text{SWIR} - \text{NIR}}{\text{SWIR} + \text{NIR}}$$
+  - *Rationale:* NDBI is highly sensitive to built-up concrete/construction areas, making it ideal for tracking Hargeisa’s physical expansion over sandy/barren soils.
+- **Temporal Alignment:**
+  - Images are filtered to focus on the dry seasons (to eliminate soil moisture fluctuations that mimic built-up reflections).
+  - A median pixel reducer is applied annually from **2020 to 2026** to create cloud-free composite maps.
+  - The annual change ($\Delta\text{NDBI}$) is calculated to pinpoint active construction and neighborhood expansion boundaries.
+
+### 3. Infrastructure & Accessibility Layers (OpenStreetMap GIS)
+- **Source:** OpenStreetMap (OSM) spatial exports (via Geofabrik and HotOSM).
+- **Feature Extraction:** Spatial networks are mapped in **GeoPandas**:
+  - **Road Networks:** Categorized by pavement type (Asphalt/Tarmac vs. Unpaved Dirt Roads). Special focus is given to the **Berbera Corridor highway**.
+  - **Key Nodes:** Location coordinates of essential amenities (Universities, Egal International Airport, central business markets, large mosques, and hospitals).
+- **Distance Analytics:**
+  - Euclidean and network-based distance maps are generated at a 10-meter raster cell resolution to calculate proximity variables:
+    - `distance_to_tarmac`
+    - `distance_to_airport`
+    - `distance_to_downtown`
+
+### 4. Spatial Grid Synthesis (The Sahan Grid)
+To build a machine learning model, these heterogeneous data sources must be aligned into a single training table:
+- **Grid Creation:** Hargeisa’s metropolitan boundary is divided into a uniform vector fishnet grid of **500m x 500m cells**.
+- **Spatial Join (Aggregation):**
+  - **Listing Density & Pricing:** Scraped properties are spatially joined to the grid cells. Cells are labeled with average price per square meter and historical price growth rate based on recurring listing deltas.
+  - **NDBI Values:** Raster satellite indices are averaged within each vector grid cell boundary.
+  - **Infrastructure Distance:** Distance values are sampled at the centroid of each grid cell.
+- **Final ML Table:** The output is a tabular dataframe where each row represents a physical 500m x 500m location in Hargeisa, containing features like built-up growth rate, proximity to infrastructure, and historical pricing, which is then fed into an **XGBoost Regressor** to predict the future Hotspot Growth Index.
 
 ---
 
