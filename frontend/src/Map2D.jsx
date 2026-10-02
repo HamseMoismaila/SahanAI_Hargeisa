@@ -157,7 +157,7 @@ function GeomanDrawControls({ onSelection }) {
           const sqmArea = area(poly);
           const center = layer.getBounds().getCenter();
           
-          fetch(`http://localhost:8080/api/predict?lat=${center.lat}&lon=${center.lng}`)
+          fetch(`http://localhost:8000/api/predict?lat=${center.lat}&lon=${center.lng}`)
             .then(res => res.json())
             .then(data => {
               layer.bindPopup(`
@@ -199,7 +199,7 @@ function MapFlyTo({ coords, clearFlyTo, onSelection }) {
       map.flyTo(coords, 16, { duration: 1.5 });
       clearFlyTo();
       
-      fetch(`http://localhost:8080/api/predict?lat=${coords[0]}&lon=${coords[1]}`)
+      fetch(`http://localhost:8000/api/predict?lat=${coords[0]}&lon=${coords[1]}`)
         .then(res => res.json())
         .then(data => {
           if (onSelection) {
@@ -242,7 +242,7 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
 
   useEffect(() => {
     // Only fetch hotspots list once on mount
-    fetch('http://localhost:8080/api/hotspots')
+    fetch('http://localhost:8000/api/hotspots')
       .then(res => res.json())
       .then(data => setHotspots(data))
       .catch(err => console.error(err));
@@ -250,7 +250,7 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
 
   useEffect(() => {
     setNdbiTileUrl(''); // Reset tiles to display correct loading sequence
-    fetch(`http://localhost:8080/api/ndbi_tile?year=${selectedYear}`)
+    fetch(`http://localhost:8000/api/ndbi_tile?year=${selectedYear}`)
       .then(res => res.json())
       .then(data => { if (data.tile_url) setNdbiTileUrl(data.tile_url); })
       .catch(err => console.error(err));
@@ -260,7 +260,7 @@ export default function Map2D({ flyToCoords, clearFlyTo, onSelection, googleApiK
     if (!selectedLocation) return;
     setPrediction(null);
     
-    fetch(`http://localhost:8080/api/predict?lat=${selectedLocation.lat}&lon=${selectedLocation.lng}`)
+    fetch(`http://localhost:8000/api/predict?lat=${selectedLocation.lat}&lon=${selectedLocation.lng}`)
       .then(res => res.json())
       .then(data => {
         setPrediction(data);

@@ -5,7 +5,7 @@ export default function HotspotsSidebar({ onSelectHotspot }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/hotspots')
+    fetch('http://localhost:8000/api/hotspots')
       .then(res => res.json())
       .then(data => {
         if (data.features) {
