@@ -1,4 +1,4 @@
-# Sahan AI: Spatial Intelligence & Real Estate Analytics Platform
+# Sahan AI: Spatial Intelligence 
 
 Sahan AI is a geospatial intelligence platform that explores how satellite data, GIS analysis, and machine learning can support real estate analysis in Hargeisa, Somaliland.
 
