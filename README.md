@@ -1,6 +1,6 @@
 <div align="center">
   <h1>Sahan AI</h1>
-  <p><strong>A Geospatial Intelligence and Machine Learning Framework for Urban Land Valuation in Emerging Markets</strong></p>
+  <p><strong>A Geospatial Intelligence and Machine Learning Project for Urban Land Valuation in Hargeisa</strong></p>
 
   [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
   [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688.svg)](https://fastapi.tiangolo.com/)
@@ -13,11 +13,11 @@
 
 ## Overview
 
-**Sahan AI** is a geospatial machine learning platform and decision-support instrument designed to quantify land valuation dynamics, environmental hazard exposure, and urban growth patterns in Hargeisa, Somaliland.
+**Sahan AI** is a geospatial machine learning project designed to explore land valuation indicators, environmental hazard analysis, and urban growth patterns in Hargeisa, Somaliland.
 
 In emerging economies, rapid urbanization frequently outpaces municipal cadastral record-keeping. The lack of a centralized Multiple Listing Service (MLS), standardized spatial transaction registries, and structured geographic layers makes property appraisal largely opaque and reliant on informal word-of-mouth estimates.
 
-Sahan AI introduces a data-driven spatial valuation framework by integrating:
+This project investigates a data-driven approach to spatial land analysis by combining:
 * **Earth Observation (EO)**: Remote sensing indicators derived from Sentinel-2 and Landsat-8 imagery via Google Earth Engine (GEE).
 * **Topological Infrastructure**: Network distance metrics extracted from OpenStreetMap (OSM) vector layers.
 * **Environmental Risk Factors**: Digital Elevation Models (DEM) for slope analysis and hydrological proximity modeling for flash-flood corridors.
@@ -35,7 +35,7 @@ Real estate markets across frontier urban centers face structural data deficits:
 * **Infrastructure Deficits**: Sparse geocoded data on municipal water distribution, paved road connectivity, and public services.
 * **Environmental Exposure**: Seasonal dry riverbeds (*Dooxa/Lagas*) subject peripheral settlements to recurrent flash flooding, alongside steep terrain grading costs.
 
-Sahan AI serves as an empirical framework to test whether open-source geospatial intelligence and satellite proxies can bridge these information gaps.
+Sahan AI explores how open-source geospatial data, satellite imagery, and machine learning can provide preliminary real estate intelligence in regions without established cadastre databases.
 
 ---
 
