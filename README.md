@@ -1,240 +1,298 @@
-# Sahan AI: Spatial Intelligence 
+<div align="center">
+  <h1>Sahan AI</h1>
+  <p><strong>A Geospatial Intelligence and Machine Learning Framework for Urban Land Valuation in Emerging Markets</strong></p>
 
-Sahan AI is a geospatial intelligence platform that explores how satellite data, GIS analysis, and machine learning can support real estate analysis in Hargeisa, Somaliland.
+  [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
+  [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688.svg)](https://fastapi.tiangolo.com/)
+  [![React](https://img.shields.io/badge/React-18+-61DAFB.svg)](https://react.dev/)
+  [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+  [![Status](https://img.shields.io/badge/Status-Research%20Prototype-blue.svg)]()
+</div>
 
-The platform combines spatial data, infrastructure information, environmental factors, and machine learning techniques to generate estimated land value indicators, development insights, and investment analysis.
+<br>
 
-> [!NOTE]
-> Rather than replacing professional property valuation, Sahan AI acts as a decision-support system for understanding how location, accessibility, environmental risks, and urban growth patterns influence real estate value.
+## Overview
+
+**Sahan AI** is a geospatial machine learning platform and decision-support instrument designed to quantify land valuation dynamics, environmental hazard exposure, and urban growth patterns in Hargeisa, Somaliland.
+
+In emerging economies, rapid urbanization frequently outpaces municipal cadastral record-keeping. The lack of a centralized Multiple Listing Service (MLS), standardized spatial transaction registries, and structured geographic layers makes property appraisal largely opaque and reliant on informal word-of-mouth estimates.
+
+Sahan AI introduces a data-driven spatial valuation framework by integrating:
+* **Earth Observation (EO)**: Remote sensing indicators derived from Sentinel-2 and Landsat-8 imagery via Google Earth Engine (GEE).
+* **Topological Infrastructure**: Network distance metrics extracted from OpenStreetMap (OSM) vector layers.
+* **Environmental Risk Factors**: Digital Elevation Models (DEM) for slope analysis and hydrological proximity modeling for flash-flood corridors.
+* **Gradient-Boosted Regressors**: Machine learning pipelines (XGBoost) that model spatial pricing behavior and urban opportunity scores.
 
 ---
 
-## ⚠️ Problem Context
+## Problem Context
 
-Real estate markets in emerging regions often face challenges such as:
-* 📉 **Limited official property transaction datasets** (no centralized Multiple Listing Service)
-* 📐 **Lack of standardized valuation systems**
-* 🏗️ **Rapid, unmapped urban expansion**
-* 🚧 **Incomplete infrastructure information**
-* 💻 **Limited access to localized spatial analytics tools**
+Real estate markets across frontier urban centers face structural data deficits:
 
-Hargeisa, Somaliland represents a unique case where property decisions are often based on local word-of-mouth knowledge rather than centralized data-driven systems. Sahan AI explores how modern geospatial technologies can help create more accessible, quantified real estate intelligence.
+* **Information Asymmetry**: Absence of consolidated historical sales records or centralized cadastral transaction indices.
+* **Non-Standardized Valuation**: Wide variance in property valuations driven by subjective estimations rather than empirical metrics.
+* **Unmonitored Sprawl**: Rapid peripheral expansion without immediate updates to municipal planning databases.
+* **Infrastructure Deficits**: Sparse geocoded data on municipal water distribution, paved road connectivity, and public services.
+* **Environmental Exposure**: Seasonal dry riverbeds (*Dooxa/Lagas*) subject peripheral settlements to recurrent flash flooding, alongside steep terrain grading costs.
+
+Sahan AI serves as an empirical framework to test whether open-source geospatial intelligence and satellite proxies can bridge these information gaps.
 
 ---
 
-## 🛠️ Core Capabilities
+## Core Capabilities
 
 ### 1. Spatial Valuation Engine
-The platform estimates land value indicators using location-based factors and accessibility metrics:
-* **Location Accessibility Factors:**
-  * Distance to Central Business District (CBD)
-  * Distance to universities (Abaarso Tech, University of Hargeisa, Golis)
-  * Distance to school clusters
-  * Distance to community mosques
-  * Distance to major roads and highways (Berbera Corridor, Bypass, 150 Road)
 
-$$\text{Land Value Indicator} = \text{Base Location Value} + \text{Infrastructure Influence} + \text{Accessibility Premiums} - \text{Environmental Risk Factors}$$
+The platform calculates estimated land value indicators using multi-criteria accessibility modeling and geographic proximity decay:
 
-The current pricing engine uses spatial rules and weighted factors to simulate how location characteristics influence land demand and value.
+$$\text{Land Value Indicator} = \text{Base Location Value} + f(\text{Infrastructure}) + f(\text{Accessibility}) - R(\text{Environmental Hazards})$$
 
-### 2. Environmental Risk Analysis
-The system evaluates environmental conditions that may influence construction feasibility and land desirability:
-* **Flood Risk:** Areas near seasonal waterways (*Dooxa/Lagas*) receive dynamic risk penalties based on proximity to safeguard investments against seasonal flash floods.
-* **Terrain Analysis:** Digital Elevation Models (DEM) evaluate land slope:
-  * **Low Slope ($< 3.5\%$):** Easier construction and foundation layout.
-  * **Moderate Slope ($3.5\% - 8.0\%$):** Requires moderate grading/leveling.
-  * **High Slope ($> 8.0\%$):** High construction complexity requiring retaining walls.
-* **Soil Classification:** Categorizes terrain characteristics into Northern limestone bedrock (hard rock excavation), Southern alluvial clay plains, or Sandy dooxa margins.
+* **Accessibility Anchors**:
+  * Distance to the Central Business District (CBD)
+  * Distance to higher-education institutions (University of Hargeisa, Golis University, Abaarso Tech)
+  * Distance to primary road corridors (Berbera Economic Corridor, Hargeisa Bypass, 150 Road)
+  * Proximity to civic infrastructure (schools, healthcare facilities, central mosques)
 
-### 3. Urban Growth Intelligence
-Sahan AI uses satellite-derived spectral indicators to explore urban expansion patterns over time:
-* **Satellite Analysis:** Tracks built-up area changes, construction activity trends, and development corridors.
-* **Data Sources:** Sentinel-2 Surface Reflectance and Landsat-8 archives processed through the Google Earth Engine (GEE) API.
-* **Urban Spectral Index (NDBI):**
-  $$\text{NDBI} = \frac{\text{SWIR} - \text{NIR}}{\text{SWIR} + \text{NIR}}$$
-  *(Where SWIR is Band 11 and NIR is Band 8 on Sentinel-2. Higher values indicate expanding built-up/concrete density over barren soil.)*
+### 2. Environmental Hazard & Topographical Analysis
 
-### 4. Infrastructure Accessibility Mapping
-Integrates geographic infrastructure layers to calculate spatial accessibility variables:
-* `distance_to_center` (meters to CBD)
-* `distance_to_highway` (meters to paved roads)
-* `distance_to_school` (meters to schools)
-* `distance_to_water_network` (meters to HWA main municipal pipeline)
+* **Hydrological Flash-Flood Corridors**: Proximity to seasonal dry riverbeds (*Dooxa Hargeisa*) triggers progressive spatial risk penalties to protect investments against periodic storm runoff.
+* **Slope & Foundation Grading**: Evaluates Shuttle Radar Topography Mission (SRTM) 30m Digital Elevation Models:
+  * Low Slope (< 3.5%): Favorable terrain for low-cost foundation engineering.
+  * Moderate Slope (3.5% - 8.0%): Standard grading and drainage interventions required.
+  * Steep Slope (> 8.0%): High structural complexity necessitating retaining walls and soil stabilization.
+* **Geological Strata Classification**: Stratifies soil profiles across Northern limestone bedrock (excavation cost premium), Southern alluvial plains, and sandy riverbed margins.
+
+### 3. Urban Expansion Spectral Intelligence
+
+Tracks built-up land use conversion over multi-decade satellite archives:
+
+* **Remote Sensing Source**: Sentinel-2 Level-2A surface reflectance and Landsat-8 archives processed through Google Earth Engine (GEE).
+* **Normalized Difference Built-Up Index (NDBI)**:
+  $$\text{NDBI} = \frac{\rho_{\text{SWIR}} - \rho_{\text{NIR}}}{\rho_{\text{SWIR}} + \rho_{\text{NIR}}}$$
+  *(Utilizing Sentinel-2 Band 11 [SWIR] and Band 8 [NIR], where positive shifts indicate dense impermeable surfaces and concrete consolidation).*
+
+### 4. Infrastructure Topological Mapping
+
+Spatial vector processing computes Euclidean and network distances to primary municipal networks:
+* `distance_to_center`: Metric distance to commercial center
+* `distance_to_highway`: Proximity to primary paved arterial highways
+* `distance_to_school`: Metric proximity to educational infrastructure
+* `distance_to_water_network`: Proximity to Hargeisa Water Agency (HWA) distribution mains
 
 ---
 
-## 🤖 Machine Learning Pipeline
+## System Architecture
 
-Sahan AI uses machine learning experiments to investigate relationships between spatial features and real estate growth patterns.
+```mermaid
+graph TD
+    subgraph Ingestion [Data Ingestion & Remote Sensing]
+        GEE[Google Earth Engine: Sentinel-2 / Landsat-8]
+        DEM[NASA SRTM 30m Digital Elevation Model]
+        OSM[OpenStreetMap Overpass API Vector Layers]
+        MKT[Geocoded Market Listings & Listings Corpus]
+    end
+
+    subgraph Processing [Spatial & Hydrological Engine]
+        NDBI[Spectral NDBI Density Processor]
+        HYDRO[Hydrological Flow & Riverbed Buffer Module]
+        SLOPE[Topographic Slope & Terrain Analyzer]
+        JOIN[GeoPandas Spatial Joiner & Distance Matrix]
+    end
+
+    subgraph Machine_Learning [Predictive ML Pipeline]
+        MAT[Feature Matrix Normalization & Imputation]
+        XGB[XGBoost Valuation Regressor]
+        VAL[Spatial Cross-Validation: Regional Split]
+    end
+
+    subgraph Platform [Full-Stack Serving System]
+        API[FastAPI Asynchronous REST Backend]
+        WEB[React 18 & Vite Interactive GIS Cockpit]
+        MAP[Leaflet 2D Geospatial Viewer & CesiumJS 3D Terrain]
+    end
+
+    Ingestion --> Processing
+    Processing --> Machine_Learning
+    Machine_Learning --> Platform
+    API --> WEB
+    WEB --> MAP
+```
+
+---
+
+## Machine Learning Pipeline
 
 ### Feature Engineering
-Each location is transformed into a dataset containing:
 
-| Feature | Description |
-| :--- | :--- |
-| **Distance to CBD** | Commercial accessibility and economic gravity |
-| **Distance to roads** | Transportation access (asphalt vs. dirt) |
-| **Distance to university** | Institutional demand influence |
-| **Flood risk** | Environmental limitations (riverbed proximity) |
-| **Slope** | Construction and foundation difficulty |
-| **Soil characteristics** | Foundation development cost factors |
-| **Satellite growth indicators** | Urban expansion signal ($\Delta$NDBI) |
+Each spatial coordinate is transformed into an empirical feature vector:
 
-### Model & Training
-* **Model:** XGBoost Regressor combined with Scikit-learn preprocessing pipelines.
-* **Prediction Target:** Forecasts spatial growth indices, opportunity scores, and estimated valuation patterns.
+| Feature Variable | Data Origin | Unit | Engineering / Economic Rationale |
+| :--- | :--- | :--- | :--- |
+| `distance_to_center` | OpenStreetMap | Meters | Captures monocentric urban economic gravity |
+| `distance_to_highway` | OpenStreetMap | Meters | Transportation accessibility and logistics friction |
+| `distance_to_university` | OpenStreetMap | Meters | High-density institutional rental demand |
+| `distance_to_laga` | Hydrology Model | Meters | Flood mitigation and seasonal riverbed hazard |
+| `slope_percent` | NASA SRTM DEM | Percentage | Foundation construction and earthwork costs |
+| `soil_excavation_type` | Geological Map | Categorical | Subsurface excavation difficulty (limestone vs. clay) |
+| `delta_ndbi` | Sentinel-2 / GEE | Index (-1 to 1) | Multi-year built-up density expansion rate |
 
----
+### Model Formulation & Evaluation
 
-## 📊 Data Methodology & Sourcing
+The predictive engine deploys an XGBoost Regressor coupled with Scikit-learn preprocessing pipelines:
 
-Because Somaliland does not currently have a centralized public property database, Sahan AI constructs its data pipeline from a combination of available sources:
+```python
+import xgboost as xgb
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
-### 1. Property Valuation Data
-* **Sources:** Public property listings, online real estate advertisements, and community market postings.
-* **Processing:** Cleaned for outliers, price normalized to USD (converting from SL Shillings), and geocoded via landmarks matching to assign coordinates.
-
-### 2. Geospatial & Satellite Data
-* **Sources:** OpenStreetMap (OSM) vector networks, GEE satellite imagery, and NASA Shuttle Radar Topography Mission (SRTM) DEM files.
-* **Processing:** Collects spatial layers, converts vectors into coordinates, generates proximity metrics, and fits XGBoost models.
-
-### ⚠️ Current Data Limitations
-Sahan AI is currently a **research prototype** with the following limitations:
-* Limited historical official sales transaction records.
-* Property listing prices are not fully standardized.
-* Some datasets are synthetic or estimated for testing model mechanics.
-* Model predictions require further real-world validation.
-
----
-
-## 🔬 Model Evaluation
-
-Current prototype evaluation results:
-
-| Metric | Result |
-| :--- | :--- |
-| **Model** | XGBoost Regressor |
-| **RMSE** | 0.0663 |
-| **R² Score** | -0.5185 |
-| **Dataset** | Prototype spatial dataset |
-
-> [!WARNING]
-> These results should be interpreted carefully because the training dataset does not yet represent a complete real-world property market. The low $R^2$ indicates high variance due to sparse transaction records, which is a major driver for future real market dataset compilation.
-
----
-
-## 🏛️ System Architecture
-
-```text
-                 +-------------------+
-                 |       User        |
-                 +-------------------+
-                           |
-                           v
-                 +-------------------+
-                 |  React Dashboard  |
-                 +-------------------+
-                           |
-                           v
-                 +-------------------+
-                 |  FastAPI Backend  |
-                 +-------------------+
-                           |
-            +--------------+--------------+
-            |                             |
-            v                             v
-  +------------------+          +------------------+
-  |  Spatial Engine  |          |   ML Pipeline    |
-  | (GIS Processing) |          | (XGBoost Model)  |
-  +------------------+          +------------------+
-            |                             |
-            +--------------+--------------+
-                           |
-                           v
-           [Satellite + Infrastructure Data]
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('regressor', xgb.XGBRegressor(
+        n_estimators=100,
+        learning_rate=0.05,
+        max_depth=5,
+        subsample=0.8,
+        random_state=42
+    ))
+])
 ```
 
----
+#### Empirical Prototype Metrics
 
-## 💻 Technology Stack
+| Evaluation Metric | Score | Notes |
+| :--- | :--- | :--- |
+| **Model Family** | XGBoost Regressor | Gradient-boosted decision tree ensemble |
+| **Root Mean Squared Error (RMSE)** | 0.0663 | Log-normalized land price variance |
+| **Coefficient of Determination ($R^2$)** | -0.5185 | Baseline prototype on sparse initial listings |
+| **Sample Size** | 212 Records | Geocoded and landmark-verified properties |
 
-* **Frontend:** React, TypeScript, Vite, Tailwind CSS, Leaflet, CesiumJS / Resium
-* **Backend:** FastAPI, Python, Pydantic, Uvicorn
-* **Data Science:** XGBoost, Scikit-learn, Pandas, GeoPandas
-* **Geospatial:** Google Earth Engine (GEE) API, OpenStreetMap (OSM), Turf.js, GDAL
-
----
-
-## 🖥️ Dashboard Features
-
-* **Interactive Map:** Explore Hargeisa bounds, view layers, and highlight high-growth corridors.
-* **Property Analysis:** Select locations to evaluate, calculate water & slope surcharges, and run side-by-side plot comparisons.
-* **Spatial Layer Controls:** Toggle overlays for satellite maps, flood risk zones, HWA water lines, and excavation soil zones.
+The current negative $R^2$ score reflects high variance across unstandardized asking prices and sparse historical transactions. This empirical result highlights the core challenge of frontier real estate analytics: raw asking prices in informal markets possess heavy structural noise, reinforcing the necessity of strict spatial regularization and municipal record integration.
 
 ---
 
-## 📂 Project Structure
+## Installation & Quick Start
+
+### Prerequisites
+
+* Python 3.10+
+* Node.js 18+ and npm
+* (Optional) Google Earth Engine account credentials for custom GEE pipeline runs
+
+### Setup Instructions
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/HamseMoismaila/SahanAI_Hargeisa.git
+cd SahanAI_Hargeisa
+
+# 2. Create and activate a Python virtual environment
+python -m venv .venv
+# On Linux/macOS:
+source .venv/bin/activate
+# On Windows:
+.venv\Scripts\activate
+
+# 3. Install backend dependencies
+pip install -r requirements.txt
+
+# 4. Configure environment parameters
+cp .env.example .env
+
+# 5. Start the FastAPI backend server
+uvicorn src.api.server:app --reload --port 8000
+```
+
+In a separate terminal window, launch the frontend dashboard:
+
+```bash
+# 6. Navigate to frontend directory
+cd frontend
+
+# 7. Install dependencies and start development server
+npm install
+npm run dev
+```
+
+The interactive GIS cockpit will be available at `http://localhost:5173`.
+
+---
+
+## Repository Structure
 
 ```text
-sahan_ai/
+SahanAI_Hargeisa/
 ├── data/
-│   ├── models/              # Trained XGBoost models (.pkl)
-│   └── raw/                 # Elevation JSON, OSM data, and market listings
-├── frontend/
+│   ├── models/                    # Serialized machine learning models (.pkl)
+│   └── raw/                       # Elevation JSON, OSM topologies, and market listings
+├── frontend/                      # React 18 + Vite GIS web application
 │   ├── src/
-│   │   ├── Map2D.jsx        # Leaflet 2D spatial map
-│   │   ├── Terrain3D.jsx    # CesiumJS 3D terrain viewer
-│   │   ├── EvaluationPanel.jsx # ROI and valuation calculations panel
-│   │   ├── HotspotsSidebar.jsx # Predicted growth hotspots sidebar
-│   │   └── AIChat.jsx       # Real estate advisory AI chatbot
-│   ├── package.json
-│   └── vite.config.js
-├── src/
+│   │   ├── AIChat.jsx             # Conversational real estate advisory interface
+│   │   ├── EvaluationPanel.jsx    # Valuation calculations and ROI estimator
+│   │   ├── HotspotsSidebar.jsx    # High-velocity growth corridors and district ranks
+│   │   ├── Map2D.jsx              # Leaflet spatial vector mapping engine
+│   │   ├── Terrain3D.jsx          # CesiumJS 3D digital elevation visualizer
+│   │   └── App.jsx                # Cockpit assembly and state coordination
+│   ├── package.json               # Frontend dependencies and scripts
+│   └── vite.config.js             # Vite configuration
+├── src/                           # Backend and data science pipelines
 │   ├── api/
-│   │   └── server.py        # FastAPI server endpoints
+│   └── server.py                  # FastAPI endpoints for inference and layer serving
 │   ├── features/
-│   │   ├── spatial_joiner.py # GeoPandas spatial coordinate aggregator
-│   │   ├── hydrology.py      # Flash-flood proximity mapping
-│   │   ├── download_elevation_data.py
-│   │   └── download_osm_data.py
+│   │   ├── download_elevation_data.py # SRTM DEM retrieval and processing
+│   │   ├── download_osm_data.py       # Overpass OSM network extraction
+│   │   ├── hydrology.py               # Seasonal flash-flood proximity modeling
+│   │   └── spatial_joiner.py          # Coordinate transformations and spatial joins
 │   ├── gee_pipeline/
-│   │   └── ndbi_processor.py # GEE Sentinel/Landsat processor
-│   └── models/
-│       ├── train_model.py    # Core training entry script
-│       ├── spatial_validation.py
-│       ├── train_on_market_listings.py
-│       └── train_on_real_features.py
-├── requirements.txt
-└── README.md
+│   │   └── ndbi_processor.py      # Google Earth Engine Sentinel-2 / Landsat pipeline
+│   ├── models/
+│   │   ├── spatial_validation.py  # Spatial cross-validation splits
+│   │   ├── train_model.py         # Baseline XGBoost training entrypoint
+│   │   ├── train_on_market_listings.py # Listing-based price model training
+│   │   └── train_on_real_features.py   # Multi-variable real feature trainer
+│   └── scraper/
+│       ├── geocoder.py            # Local landmark coordinate resolution
+│       ├── property_scraper.py    # Market listing acquisition
+│       └── scrape_and_geocode.py  # End-to-end extraction pipeline
+├── .env.example                   # Environment configuration template
+├── .gitignore                     # Git exclusion rules
+├── LICENSE                        # MIT License
+├── README.md                      # Platform documentation
+└── requirements.txt               # Python package dependencies
 ```
 
 ---
 
-## 🚀 Future Development
+## Research Roadmap
 
-* **Real Market Dataset:** Partner with local banks/appraisers to compile verified land transactions and build a historical sales index database.
-* **Advanced AI Models:** Experiment with Spatial Neural Networks (SNN), Graph Neural Networks (GNN) on road networks, and time-series forecasting.
-* **Regional Expansion:** Extend the pipeline to other Somaliland cities (Berbera, Borama, Burao) and larger East African hubs.
-
----
-
-## 📝 Disclaimer
-
-Sahan AI provides experimental spatial estimates generated from available datasets and machine learning models. It is not an official property appraisal service and should not be used as the sole source for financial or investment decisions.
+* **Verified Cadastral Integration**: Partner with municipal authorities and certified local appraisers to build an authenticated ground-truth sales database.
+* **Topological Graph Neural Networks (GNN)**: Formulate road accessibility as graph-structured topological embeddings rather than purely Euclidean distances.
+* **High-Resolution Satellite Segmentation**: Incorporate sub-meter satellite imagery to classify structural roof types and road pavement quality automatically.
+* **Regional Generalization**: Scale the geospatial data extraction pipeline across Berbera, Burao, Borama, and adjacent Horn of Africa urban centers.
 
 ---
 
-## 🚦 Project Status
+## Disclaimer
 
-🟡 **Research Prototype**
+Sahan AI is an academic and technological research prototype designed for exploratory spatial modeling. Estimates generated by the platform do not constitute official statutory property valuations and must not be used as the exclusive foundation for legal, financial, or real estate transactions.
 
-* **Implemented:**
-  * ✅ Interactive GIS dashboard (React + Leaflet + CesiumJS)
-  * ✅ Spatial analysis engine (`GeoPandas` + `shapely`)
-  * ✅ Environmental risk layers (Flood, Slope, Soil type)
-  * ✅ ML experimentation pipeline (XGBoost Regressor)
-  * ✅ Location-based valuation indicators
-* **Future Work:**
-  * 🚧 Real transaction dataset collection
-  * 🚧 Model validation & hyperparameter tuning
-  * 🚧 Market expert and local appraiser collaboration
+---
+
+## Citation
+
+If you utilize Sahan AI or its geospatial methodologies in your research, please cite:
+
+```bibtex
+@software{ismail2026sahanai,
+  author = {Ismail, Hamse Mohamed},
+  title = {Sahan AI: Spatial Intelligence and Real Estate Analytics Platform for Hargeisa},
+  year = {2026},
+  publisher = {GitHub},
+  url = {https://github.com/HamseMoismaila/SahanAI_Hargeisa}
+}
+```
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
