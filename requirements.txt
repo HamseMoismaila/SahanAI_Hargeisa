@@ -4,26 +4,27 @@ geopandas
 rasterio
 shapely
 pysheds
+pyproj
+h3
 scipy
 
-# Earth Engine
+# Earth Engine & HTTP STAC
 earthengine-api
-
+requests
 
 # Machine Learning
 scikit-learn
 xgboost
+joblib
 
 # Web Scraping
 playwright
 beautifulsoup4
-requests
 geopy
 
-# Backend API
+# Backend API & Testing
 fastapi
 uvicorn
 pydantic
-
-# Environment management
 python-dotenv
+pytest

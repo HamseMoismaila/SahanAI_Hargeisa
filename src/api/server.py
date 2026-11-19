@@ -87,10 +87,17 @@ def chat_with_ai(chat: ChatMessage):
 
 @app.get("/api/hotspots")
 def get_hotspots():
-    """Returns realistic ML-predicted hotspots as GeoJSON."""
+    """Returns ML-predicted urban expansion hotspots as GeoJSON."""
     from src.models.train_model import GrowthPredictor
     predictor = GrowthPredictor()
     return predictor.get_top_hotspots()
+
+@app.get("/api/h3_risk")
+def get_h3_risk(resolution: int = 8):
+    """Returns Uber H3 DGGS hexagonal flood-exposure & Delta-NDBI GeoJSON."""
+    from src.models.train_model import GrowthPredictor
+    predictor = GrowthPredictor()
+    return predictor.get_h3_risk_hexagons(resolution=resolution)
 
 @app.get("/api/predict")
 def predict_location(lat: float, lon: float):

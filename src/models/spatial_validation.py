@@ -1,174 +1,114 @@
-import json
-import os
+"""Spatial Group Cross-Validation & Uber H3 DGGS Evaluation for Sahan AI.
+
+Evaluates model generalization across spatially disjoint Hargeisa districts
+using real Sentinel-2 L2A (2020-2026) NDBI/NDVI reflectance, NASA SRTM elevation
+and slope gradients, EPSG:32638 Dooxa riverbed distances, and OSM infrastructure.
+"""
+
 import numpy as np
-import pandas as pd
 import xgboost as xgb
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.model_selection import GroupKFold
 
-def extract_osm_landmarks():
-    osm_path = "data/raw/hargeisa_osm_data.json"
-    if not os.path.exists(osm_path):
-        raise FileNotFoundError(f"Missing raw OSM data file: {osm_path}")
-        
-    with open(osm_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-        
-    elements = data.get("elements", [])
-    node_coords = {el["id"]: (el["lat"], el["lon"]) for el in elements if el.get("type") == "node" and "lat" in el}
-    
-    roads = []
-    schools = []
-    masjids = []
-    
-    for el in elements:
-        tags = el.get("tags", {})
-        if el.get("type") == "node":
-            lat = el.get("lat")
-            lon = el.get("lon")
-            if lat and lon:
-                if tags.get("amenity") == "school":
-                    schools.append((lat, lon))
-                elif tags.get("amenity") == "place_of_worship":
-                    masjids.append((lat, lon))
-        elif el.get("type") == "way" and "highway" in tags:
-            way_nodes = el.get("nodes", [])
-            for node_id in way_nodes:
-                if node_id in node_coords:
-                    roads.append(node_coords[node_id])
-                    
-    return roads, schools, masjids
+from src.features.feature_builder import build_real_spatial_dataframe
+from src.features.spatial_joiner import SpatialJoiner
 
-def calc_dist(p1, p2):
-    return np.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2) * 111000
+TRAIN_NEIGHBORHOODS = [
+    "Jigjiga Yar, Hargeisa",
+    "New Hargeisa, Hargeisa",
+    "Dararweyne, Hargeisa",
+]
 
-def perform_spatial_validation():
-    listings_path = "data/raw/real_market_listings.csv"
-    if not os.path.exists(listings_path):
-        raise FileNotFoundError(f"Missing market listings file: {listings_path}")
-        
-    df_listings = pd.read_csv(listings_path)
-    
-    # Parse neighborhood name from address
-    df_listings['neighborhood'] = df_listings['address'].apply(lambda x: x.split("near ")[1])
-    
-    roads, schools, masjids = extract_osm_landmarks()
-    city_center = (9.5600, 44.0650)
-    university = (9.5400, 44.0200)
-    laga_center = (9.5560, 44.0500)
-    airport = (9.5180, 44.0890)
-    
-    sub_cities = [
-        {"name": "Ibrahim Koodbuur District", "coords": (9.585, 44.050), "tax": 0.25},
-        {"name": "26 June District", "coords": (9.565, 44.065), "tax": 0.25},
-        {"name": "31 May District", "coords": (9.555, 44.085), "tax": 0.15},
-        {"name": "Ga'an Libaax District", "coords": (9.560, 44.100), "tax": 0.15},
-        {"name": "Mohamoud Haybe District", "coords": (9.535, 44.060), "tax": 0.10},
-        {"name": "Ahmed Dhagah District", "coords": (9.540, 44.030), "tax": 0.10}
+TEST_NEIGHBORHOODS = [
+    "Goljano, Hargeisa",
+    "Ibrahim Koodbuur, Hargeisa",
+    "Masalaha, Hargeisa",
+]
+
+
+def perform_spatial_validation() -> dict:
+    """Run spatial block cross-validation across disjoint Hargeisa districts."""
+    df = build_real_spatial_dataframe()
+
+    env_features = [
+        "ndbi_2020",
+        "ndbi_change",
+        "ndvi_2026",
+        "elevation_m",
+        "slope_pct",
+        "dist_to_road",
+        "dist_to_center",
+        "dist_to_university",
+        "dist_to_laga",
+        "population_density",
     ]
-    
-    records = []
-    for _, row in df_listings.iterrows():
-        pt = (row['lat'], row['lon'])
-        dist_to_center = calc_dist(pt, city_center)
-        dist_to_uni = calc_dist(pt, university)
-        dist_to_road = min([calc_dist(pt, r) for r in roads]) if roads else 1000
-        dist_to_school = min([calc_dist(pt, s) for s in schools]) if schools else 1500
-        dist_to_masjid = min([calc_dist(pt, m) for m in masjids]) if masjids else 800
-        dist_to_laga = calc_dist(pt, laga_center)
-        dist_to_airport = calc_dist(pt, airport)
-        
-        closest_sc = min(sub_cities, key=lambda sc: calc_dist(pt, sc["coords"]))
-        tax_rate = closest_sc["tax"]
-        
-        pop_density = round(100 * np.exp(-dist_to_center / 2500) + 50 * np.exp(-dist_to_uni / 1800), 1)
-        ndbi_change = 0.15 * np.exp(-dist_to_center / 3000)
-        
-        records.append({
-            'neighborhood': row['neighborhood'],
-            'lat': row['lat'],
-            'lon': row['lon'],
-            'ndbi_change': ndbi_change,
-            'dist_to_road': dist_to_road,
-            'dist_to_highway': dist_to_road * 1.5,
-            'dist_to_center': dist_to_center,
-            'dist_to_university': dist_to_uni,
-            'dist_to_laga': dist_to_laga,
-            'dist_to_airport': dist_to_airport,
-            'tax_rate': tax_rate,
-            'population_density': pop_density,
-            'market_price_sqm': row['market_price_sqm']
-        })
-        
-    df = pd.DataFrame(records)
-    
-    # Define features
-    features = [
-        'ndbi_change', 
-        'dist_to_road', 
-        'dist_to_highway', 
-        'dist_to_center', 
-        'dist_to_university',
-        'dist_to_laga',
-        'dist_to_airport',
-        'tax_rate',
-        'population_density'
+    market_features = [
+        "ndbi_change",
+        "ndvi_2026",
+        "elevation_m",
+        "slope_pct",
+        "dist_to_road",
+        "dist_to_highway",
+        "dist_to_center",
+        "dist_to_university",
+        "dist_to_laga",
+        "dist_to_airport",
+        "tax_rate",
+        "population_density",
     ]
-    
-    # Spatial Group Split:
-    # We partition neighborhoods so both Train and Test contain representative price ranges
-    train_neighborhoods = [
-        "Jigjiga Yar, Hargeisa",       # Premium pricing ($90/sqm)
-        "New Hargeisa, Hargeisa",      # Mid-range pricing ($50/sqm)
-        "Dararweyne, Hargeisa"         # Outlying pricing ($20/sqm)
-    ]
-    
-    test_neighborhoods = [
-        "Goljano, Hargeisa",           # Premium pricing ($80/sqm)
-        "Ibrahim Koodbuur, Hargeisa",  # Premium pricing ($70/sqm)
-        "Masalaha, Hargeisa"           # Mid-range pricing ($40/sqm)
-    ]
-    
-    train_df = df[df['neighborhood'].isin(train_neighborhoods)]
-    test_df = df[df['neighborhood'].isin(test_neighborhoods)]
-    
-    print(f"Total listings: {len(df)}")
-    print(f"Spatial Group Cross-Validation Split:")
-    print(f"  - Training Set: {len(train_df)} plots in {train_neighborhoods}")
-    print(f"  - Testing Set (Unseen Regions): {len(test_df)} plots in {test_neighborhoods}\n")
-    
-    X_train = train_df[features]
-    y_train = train_df['market_price_sqm']
-    
-    X_test = test_df[features]
-    y_test = test_df['market_price_sqm']
-    
-    model = xgb.XGBRegressor(
-        objective='reg:squarederror',
-        n_estimators=100,
-        learning_rate=0.08,
-        max_depth=4,
-        random_state=42
+
+    # 1. 3-Fold Spatial GroupKFold across all 6 Hargeisa districts (prevents spatial leakage)
+    gkf = GroupKFold(n_splits=3)
+    oof_flood = np.zeros(len(df))
+    oof_price = np.zeros(len(df))
+
+    for tr_idx, te_idx in gkf.split(df, groups=df["neighborhood"]):
+        tr, te = df.iloc[tr_idx], df.iloc[te_idx]
+
+        fm = xgb.XGBRegressor(objective="reg:squarederror", n_estimators=120, learning_rate=0.06, max_depth=4, random_state=42)
+        fm.fit(tr[env_features], tr["flood_exposure_score"])
+        oof_flood[te_idx] = fm.predict(te[env_features])
+
+        pm = xgb.XGBRegressor(objective="reg:squarederror", n_estimators=100, learning_rate=0.08, max_depth=4, random_state=42)
+        pm.fit(tr[market_features], tr["market_price_sqm"])
+        oof_price[te_idx] = pm.predict(te[market_features])
+
+    flood_rmse = float(mean_squared_error(df["flood_exposure_score"], oof_flood) ** 0.5)
+    flood_mae = float(mean_absolute_error(df["flood_exposure_score"], oof_flood))
+    flood_r2 = float(r2_score(df["flood_exposure_score"], oof_flood))
+
+    price_rmse = float(mean_squared_error(df["market_price_sqm"], oof_price) ** 0.5)
+    price_r2 = float(r2_score(df["market_price_sqm"], oof_price))
+
+    print(f"Total real-feature observations: {len(df)} across {df['neighborhood'].nunique()} districts")
+    print("\n--- 3-FOLD SPATIAL GROUP CROSS-VALIDATION (UNSEEN DISTRICTS) ---")
+    print(f"Flash-Flood Exposure RMSE: {flood_rmse:.4f} | MAE: {flood_mae:.4f} | R2: {flood_r2:.4f}")
+    print(f"Informal Land Valuation RMSE: ${price_rmse:.2f}/sqm | R2: {price_r2:.4f}")
+
+    # 2. Uber H3 DGGS Resolution-8 Zonal Aggregation
+    joiner = SpatialJoiner()
+    h3_gdf = joiner.aggregate_to_h3(
+        df.rename(columns={"ndbi_change": "delta_ndbi"}),
+        resolution=8,
+        agg_cols=["delta_ndbi", "ndvi_2026", "elevation_m", "slope_pct", "dist_to_laga", "flood_exposure_score"],
     )
-    
-    print("Training XGBoost on balanced spatial training set...")
-    model.fit(X_train, y_train)
-    
-    preds = model.predict(X_test)
-    rmse = mean_squared_error(y_test, preds) ** 0.5
-    r2 = r2_score(y_test, preds)
-    
-    print("\n--- SPATIAL GROUP CROSS-VALIDATION REPORT ---")
-    print(f"Testing RMSE on Unseen Districts: ${rmse:.2f}/sqm")
-    print(f"Testing R2 Score on Unseen Districts: {r2:.6f} (accuracy)")
-    
-    test_results = pd.DataFrame({
-        'Neighborhood': test_df['neighborhood'],
-        'Actual': y_test,
-        'Predicted': preds,
-        'Deviation': abs(y_test - preds)
-    })
-    print("\nSample Predictions on Unseen test neighborhoods:")
-    print(test_results.groupby('Neighborhood').mean().to_string())
+    print(f"\n--- UBER H3 DGGS (RES 8) ZONAL SUMMARY: {len(h3_gdf)} POPULATED HEXAGONS ---")
+    print(
+        h3_gdf[["h3_index", "observation_count", "mean_delta_ndbi", "mean_dist_to_laga", "mean_flood_exposure_score"]]
+        .sort_values("mean_flood_exposure_score", ascending=False)
+        .head(5)
+        .to_string(index=False)
+    )
+
+    return {
+        "flood_rmse": flood_rmse,
+        "flood_mae": flood_mae,
+        "flood_r2": flood_r2,
+        "price_rmse": price_rmse,
+        "price_r2": price_r2,
+        "h3_cell_count": len(h3_gdf),
+    }
+
 
 if __name__ == "__main__":
     perform_spatial_validation()
